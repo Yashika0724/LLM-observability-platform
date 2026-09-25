@@ -3,4 +3,5 @@ uvicorn[standard]
 openai
 traceloop-sdk
 httpx
+requests
 python-dotenv
