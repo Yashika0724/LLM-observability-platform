@@ -28,6 +28,11 @@ export async function signup(req, res) {
   });
 }
 
+export async function me(req, res) {
+  const user = await User.findById(req.user.id);
+  res.json({ id: user._id, name: user.name, email: user.email, role: user.role });
+}
+
 export async function login(req, res) {
   const { email, password } = req.body;
 
