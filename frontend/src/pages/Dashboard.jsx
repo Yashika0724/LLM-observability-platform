@@ -1,11 +1,12 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import KpiCard from "../components/KpiCard.jsx";
 import TraceTable from "../components/TraceTable.jsx";
 import UsageChart from "../components/UsageChart.jsx";
 import ModelCard from "../components/ModelCard.jsx";
 import HeroCard from "../components/HeroCard.jsx";
 import TraceDetailPanel from "../components/TraceDetailPanel.jsx";
-import { dummyTraces, modelStats } from "../utils/dummyData.js";
+import { modelStats } from "../utils/dummyData.js";
+import api from "../utils/api.js";
 import {
   totalTraces,
   avgLatencyMs,
@@ -15,11 +16,20 @@ import {
 
 export default function Dashboard() {
   const [statusFilter, setStatusFilter] = useState("all");
+  const [traces, setTraces] = useState([]);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    api
+      .get("/traces")
+      .then((res) => setTraces(res.data.traces))
+      .catch((err) => setError(err.response?.data?.error || "Could not load traces"));
+  }, []);
 
   const filteredTraces = useMemo(() => {
-    if (statusFilter === "all") return dummyTraces;
-    return dummyTraces.filter((t) => t.status === statusFilter);
-  }, [statusFilter]);
+    if (statusFilter === "all") return traces;
+    return traces.filter((t) => t.status === statusFilter);
+  }, [statusFilter, traces]);
 
   const kpis = [
     { label: "Total Traces", value: totalTraces(filteredTraces) },
@@ -59,7 +69,7 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2">
-          <TraceDetailPanel trace={filteredTraces[filteredTraces.length - 1]} />
+          <TraceDetailPanel trace={filteredTraces[0]} />
         </div>
         <UsageChart traces={filteredTraces} />
       </div>
@@ -72,9 +82,9 @@ export default function Dashboard() {
 
       <TraceTable traces={filteredTraces} />
 
+      {error && <p className="text-xs text-red-400">{error}</p>}
       <p className="text-xs text-slate-600">
-        Showing placeholder demo data. Live traces will populate this view
-        once the tracing API (Week 2) is connected.
+        Model cards above still show placeholder demo data.
       </p>
     </div>
   );

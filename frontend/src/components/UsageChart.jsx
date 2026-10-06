@@ -2,12 +2,13 @@ import { Line } from "react-chartjs-2";
 import "../utils/chartSetup.js";
 
 export default function UsageChart({ traces }) {
+  const oldestFirst = [...traces].reverse();
   const data = {
-    labels: traces.map((t) => t.timestamp.split(" ")[1]),
+    labels: oldestFirst.map((t) => new Date(t.createdAt).toLocaleTimeString()),
     datasets: [
       {
         label: "Latency (ms)",
-        data: traces.map((t) => t.latencyMs),
+        data: oldestFirst.map((t) => t.durationMs),
         borderColor: "#818cf8",
         backgroundColor: "#818cf8",
         tension: 0.3,

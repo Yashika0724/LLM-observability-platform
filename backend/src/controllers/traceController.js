@@ -11,7 +11,7 @@ export async function listTraces(req, res) {
   const limit = Number(req.query.limit) || 20;
 
   const applicationIds = await getUserApplicationIds(req.user.id);
-  const filter = { application: { $in: applicationIds } };
+  const filter = { application: { $in: applicationIds }, model: { $ne: null } };
 
   const traces = await Trace.find(filter)
     .select("-spans")

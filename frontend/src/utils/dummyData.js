@@ -1,14 +1,3 @@
-// Placeholder demo data only — Week 2 replaces this with traces fetched
-// from the backend tracing API and stored in MongoDB.
-export const dummyTraces = [
-  { id: 1, prompt: "Summarize this support ticket", model: "gpt-4o-mini", tokens: 320, latencyMs: 640, costUsd: 0.0021, status: "success", timestamp: "2026-09-15 10:02" },
-  { id: 2, prompt: "Generate SQL from natural language", model: "gpt-4o", tokens: 512, latencyMs: 980, costUsd: 0.0087, status: "success", timestamp: "2026-09-15 10:05" },
-  { id: 3, prompt: "Classify sentiment of review", model: "gpt-4o-mini", tokens: 180, latencyMs: 410, costUsd: 0.0009, status: "success", timestamp: "2026-09-15 10:09" },
-  { id: 4, prompt: "Extract entities from contract clause", model: "gpt-4o", tokens: 764, latencyMs: 1240, costUsd: 0.0132, status: "error", timestamp: "2026-09-15 10:12" },
-  { id: 5, prompt: "Draft follow-up email", model: "gpt-4o-mini", tokens: 275, latencyMs: 530, costUsd: 0.0016, status: "success", timestamp: "2026-09-15 10:18" },
-  { id: 6, prompt: "Translate product description", model: "gpt-4o-mini", tokens: 210, latencyMs: 470, costUsd: 0.0012, status: "success", timestamp: "2026-09-15 10:22" },
-];
-
 // Placeholder per-model summary stats for the top model cards.
 export const modelStats = [
   {
