@@ -55,7 +55,7 @@ async function saveSpan(applicationId, span) {
 
   if (status === "error") {
     trace.status = "error";
-    trace.error = span.status.message;
+    trace.error = span.status.message || attributes["error.type"];
   }
 
   const userId = attributes["traceloop.association.properties.user_id"];
