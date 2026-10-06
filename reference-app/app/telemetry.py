@@ -22,5 +22,7 @@ def init_telemetry():
     Traceloop.init(
         app_name="reference-llm-app",
         exporter=OTLPSpanExporter(endpoint=traces_url),
-        disable_batch=True,  # send each trace immediately (nice for local dev)
+        # Batch mode: traces are sent in the background so a slow or offline
+        # backend never blocks the user's request (important for bulk traffic).
+        disable_batch=False,
     )
