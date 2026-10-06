@@ -18,22 +18,24 @@ export default function TraceTable({ traces }) {
         <tbody>
           {traces.map((t) => (
             <tr
-              key={t.id}
+              key={t.traceId}
               className="border-t border-white/10 transition-colors duration-150 hover:bg-white/5"
             >
               <td className="px-4 py-3 text-slate-200 max-w-xs truncate">
-                {t.prompt}
+                {t.input}
               </td>
               <td className="px-4 py-3 text-slate-400">{t.model}</td>
-              <td className="px-4 py-3 text-slate-400">{t.tokens}</td>
-              <td className="px-4 py-3 text-slate-400">{t.latencyMs} ms</td>
+              <td className="px-4 py-3 text-slate-400">{t.tokenUsage.total}</td>
+              <td className="px-4 py-3 text-slate-400">{t.durationMs} ms</td>
               <td className="px-4 py-3 text-slate-400">
-                ${t.costUsd.toFixed(4)}
+                ${t.cost.toFixed(4)}
               </td>
               <td className="px-4 py-3">
                 <StatusBadge status={t.status} />
               </td>
-              <td className="px-4 py-3 text-slate-500">{t.timestamp}</td>
+              <td className="px-4 py-3 text-slate-500">
+                {new Date(t.createdAt).toLocaleString()}
+              </td>
             </tr>
           ))}
         </tbody>
