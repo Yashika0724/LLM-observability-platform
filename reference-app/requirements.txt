@@ -2,6 +2,7 @@ fastapi
 uvicorn[standard]
 openai
 traceloop-sdk
+chromadb
 httpx
 requests
 python-dotenv

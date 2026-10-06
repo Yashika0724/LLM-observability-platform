@@ -9,6 +9,11 @@ from app.telemetry import init_telemetry
 
 init_telemetry()
 
+# Build the knowledge base (vector database) once at startup.
+from app.rag import init_kb
+
+init_kb()
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
