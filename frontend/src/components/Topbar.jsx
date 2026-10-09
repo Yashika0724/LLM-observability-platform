@@ -1,6 +1,22 @@
-import { Search, Bell } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Search, Bell, LogOut } from "lucide-react";
 
 export default function Topbar() {
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const initials = (user.name || "?")
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
+
   return (
     <header className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5 backdrop-blur-xl">
       <div>
@@ -25,9 +41,19 @@ export default function Topbar() {
           <Bell size={16} />
           <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-pink-400" />
         </button>
-        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 hover:scale-105 transition-transform duration-200">
-          YS
+        <div
+          title={user.email}
+          className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 hover:scale-105 transition-transform duration-200"
+        >
+          {initials}
         </div>
+        <button
+          onClick={handleLogout}
+          title="Log out"
+          className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all duration-200"
+        >
+          <LogOut size={16} />
+        </button>
       </div>
     </header>
   );

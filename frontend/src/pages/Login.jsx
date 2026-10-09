@@ -69,11 +69,6 @@ export default function Login() {
             Register
           </Link>
         </p>
-        <p className="text-xs text-slate-600 text-center">
-          <Link to="/dashboard" className="hover:text-slate-400">
-            Skip to dashboard preview →
-          </Link>
-        </p>
       </form>
     </div>
   );

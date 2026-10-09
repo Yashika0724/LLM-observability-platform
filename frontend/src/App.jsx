@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Sidebar from "./components/Sidebar.jsx";
 import Topbar from "./components/Topbar.jsx";
 import BackgroundGlow from "./components/BackgroundGlow.jsx";
@@ -20,6 +20,10 @@ export default function App() {
         </Routes>
       </div>
     );
+  }
+
+  if (!localStorage.getItem("token")) {
+    return <Navigate to="/" replace />;
   }
 
   return (
