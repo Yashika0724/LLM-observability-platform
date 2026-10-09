@@ -19,6 +19,7 @@ export async function listTraces(req, res) {
     .skip((page - 1) * limit)
     .limit(limit);
   const total = await Trace.countDocuments(filter);
+  console.log(`[dashboard] sending ${traces.length} of ${total} traces (page ${page})`);
 
   res.json({ traces, total, page, limit });
 }

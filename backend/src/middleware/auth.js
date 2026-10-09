@@ -30,6 +30,7 @@ export async function requireApiKey(req, res, next) {
     return res.status(401).json({ error: "Invalid API key" });
   }
 
+  console.log(`[ingest] API key OK -> app "${application.name}"`);
   req.application = application;
   next();
 }

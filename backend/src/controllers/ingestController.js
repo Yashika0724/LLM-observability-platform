@@ -36,6 +36,7 @@ async function saveSpan(applicationId, span) {
   let trace = await Trace.findOne({ traceId });
   if (!trace) {
     trace = new Trace({ traceId, application: applicationId, startTime, endTime, durationMs: 0 });
+    console.log(`  new trace ${traceId.slice(0, 8)}`);
   }
 
   trace.spans.push({
@@ -69,14 +70,20 @@ async function saveSpan(applicationId, span) {
     trace.tokenUsage.prompt += attributes["gen_ai.usage.input_tokens"] ?? 0;
     trace.tokenUsage.completion += attributes["gen_ai.usage.output_tokens"] ?? 0;
     trace.tokenUsage.total += attributes["gen_ai.usage.total_tokens"] ?? 0;
+    console.log(`  LLM call: ${trace.model} | ${trace.tokenUsage.prompt} in / ${trace.tokenUsage.completion} out tokens | "${trace.input}"`);
   }
 
   await trace.save();
+  console.log(`  saved span "${span.name}" (${endTime - startTime} ms) -> trace ${traceId.slice(0, 8)}`);
 }
 
 export async function ingestTraces(req, res) {
   const message = ExportTraceServiceRequest.decode(req.body);
   const request = ExportTraceServiceRequest.toObject(message, { longs: Number, arrays: true });
+  const spanCount = request.resourceSpans
+    .flatMap((resourceSpans) => resourceSpans.scopeSpans)
+    .reduce((count, scopeSpans) => count + scopeSpans.spans.length, 0);
+  console.log(`[ingest] decoded ${spanCount} spans from ${req.body.length} bytes of protobuf`);
 
   for (const resourceSpans of request.resourceSpans) {
     for (const scopeSpans of resourceSpans.scopeSpans) {
