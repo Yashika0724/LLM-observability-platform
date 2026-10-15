@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import Application from "../models/Application.js";
 import { hashApiKey } from "../utils/apiKey.js";
 
+// Users: verify JWT
 export function protect(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -19,12 +20,14 @@ export function protect(req, res, next) {
   }
 }
 
+// Apps: verify API key
 export async function requireApiKey(req, res, next) {
   const apiKey = req.headers["x-api-key"];
   if (!apiKey) {
     return res.status(401).json({ error: "No API key provided" });
   }
 
+  // Look up by hash (raw keys aren't stored)
   const application = await Application.findOne({ keyHash: hashApiKey(apiKey) });
   if (!application) {
     return res.status(401).json({ error: "Invalid API key" });
@@ -35,6 +38,7 @@ export async function requireApiKey(req, res, next) {
   next();
 }
 
+// RBAC: allow only given roles
 export function authorize(...allowedRoles) {
   return (req, res, next) => {
     if (!allowedRoles.includes(req.user.role)) {

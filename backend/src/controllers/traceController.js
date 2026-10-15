@@ -1,6 +1,7 @@
 import Application from "../models/Application.js";
 import Trace from "../models/Trace.js";
 
+// User's own app ids
 async function getUserApplicationIds(userId) {
   const applications = await Application.find({ owner: userId }).select("_id");
   return applications.map((application) => application._id);
@@ -14,9 +15,9 @@ export async function listTraces(req, res) {
   const filter = { application: { $in: applicationIds }, model: { $ne: null } };
 
   const traces = await Trace.find(filter)
-    .select("-spans")
+    .select("-spans") // smaller response
     .sort({ createdAt: -1 })
-    .skip((page - 1) * limit)
+    .skip((page - 1) * limit) // pagination
     .limit(limit);
   const total = await Trace.countDocuments(filter);
   console.log(`[dashboard] sending ${traces.length} of ${total} traces (page ${page})`);
@@ -26,6 +27,7 @@ export async function listTraces(req, res) {
 
 export async function getTrace(req, res) {
   const applicationIds = await getUserApplicationIds(req.user.id);
+  // Must belong to user's app
   const trace = await Trace.findOne({
     traceId: req.params.traceId,
     application: { $in: applicationIds },

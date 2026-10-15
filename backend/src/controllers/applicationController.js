@@ -8,10 +8,11 @@ export async function createApplication(req, res) {
   const application = await Application.create({
     name,
     owner: req.user.id,
-    keyHash: hashApiKey(rawKey),
+    keyHash: hashApiKey(rawKey), // store hash only
     keyPreview: rawKey.slice(-4),
   });
 
+  // Raw key shown only once
   res.status(201).json({
     id: application._id,
     name: application.name,

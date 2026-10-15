@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+// Span = one step (retrieval, LLM call, ...)
 const spanSchema = new mongoose.Schema(
   {
     spanId: { type: String, required: true },
@@ -9,11 +10,12 @@ const spanSchema = new mongoose.Schema(
     endTime: { type: Date, required: true },
     durationMs: { type: Number, required: true },
     status: { type: String, enum: ["success", "error"], default: "success" },
-    attributes: { type: mongoose.Schema.Types.Mixed, default: {} },
+    attributes: { type: mongoose.Schema.Types.Mixed, default: {} }, // varies per span
   },
   { _id: false }
 );
 
+// Trace = one full request, made of spans
 const traceSchema = new mongoose.Schema(
   {
     traceId: { type: String, required: true, unique: true },
@@ -36,9 +38,9 @@ const traceSchema = new mongoose.Schema(
       completion: { type: Number, default: 0 },
       total: { type: Number, default: 0 },
     },
-    cost: { type: Number, default: 0 },
+    cost: { type: Number, default: 0 }, // next phase
     spans: [spanSchema],
-    evaluation: {
+    evaluation: { // next phase
       score: { type: Number, default: null },
       rationale: { type: String, default: null },
     },
@@ -46,6 +48,7 @@ const traceSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Fast dashboard query
 traceSchema.index({ application: 1, createdAt: -1 });
 
 const Trace = mongoose.model("Trace", traceSchema);

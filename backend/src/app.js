@@ -10,15 +10,18 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(morgan("dev"));
+app.use(morgan("dev")); // request logs
 
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
+// Dashboard routes (JWT)
 app.use("/api/auth", authRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/traces", traceRoutes);
+
+// Trace ingestion (API key)
 app.use("/v1", ingestRoutes);
 
 export default app;

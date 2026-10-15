@@ -2,6 +2,7 @@ import { fileURLToPath } from "url";
 import protobuf from "protobufjs";
 import Trace from "../models/Trace.js";
 
+// Load OTLP format for decoding
 const protoPath = fileURLToPath(new URL("../proto/trace.proto", import.meta.url));
 const ExportTraceServiceRequest = protobuf
   .loadSync(protoPath)
@@ -28,11 +29,12 @@ async function saveSpan(applicationId, span) {
     attributes[key] = readValue(value);
   }
 
-  const startTime = new Date(span.startTimeUnixNano / 1e6);
+  const startTime = new Date(span.startTimeUnixNano / 1e6); // ns -> ms
   const endTime = new Date(span.endTimeUnixNano / 1e6);
-  const status = span.status?.code === 2 ? "error" : "success";
+  const status = span.status?.code === 2 ? "error" : "success"; // 2 = error
   const traceId = toHex(span.traceId);
 
+  // Group spans by traceId
   let trace = await Trace.findOne({ traceId });
   if (!trace) {
     trace = new Trace({ traceId, application: applicationId, startTime, endTime, durationMs: 0 });
@@ -50,10 +52,12 @@ async function saveSpan(applicationId, span) {
     attributes,
   });
 
+  // Total duration
   if (startTime < trace.startTime) trace.startTime = startTime;
   if (endTime > trace.endTime) trace.endTime = endTime;
   trace.durationMs = trace.endTime - trace.startTime;
 
+  // One failed span = failed trace
   if (status === "error") {
     trace.status = "error";
     trace.error = span.status.message || attributes["error.type"];
@@ -78,6 +82,7 @@ async function saveSpan(applicationId, span) {
 }
 
 export async function ingestTraces(req, res) {
+  // Decode protobuf body
   const message = ExportTraceServiceRequest.decode(req.body);
   const request = ExportTraceServiceRequest.toObject(message, { longs: Number, arrays: true });
   const spanCount = request.resourceSpans
@@ -85,6 +90,7 @@ export async function ingestTraces(req, res) {
     .reduce((count, scopeSpans) => count + scopeSpans.spans.length, 0);
   console.log(`[ingest] decoded ${spanCount} spans from ${req.body.length} bytes of protobuf`);
 
+  // resourceSpans -> scopeSpans -> spans
   for (const resourceSpans of request.resourceSpans) {
     for (const scopeSpans of resourceSpans.scopeSpans) {
       for (const span of scopeSpans.spans) {
