@@ -1,6 +1,7 @@
 import { fileURLToPath } from "url";
 import protobuf from "protobufjs";
 import Trace from "../models/Trace.js";
+import { calculateCost } from "../utils/pricing.js";
 
 // Load OTLP format for decoding
 const protoPath = fileURLToPath(new URL("../proto/trace.proto", import.meta.url));
@@ -71,10 +72,13 @@ async function saveSpan(applicationId, span) {
     trace.model = attributes["gen_ai.response.model"] ?? attributes["gen_ai.request.model"];
     trace.input = lastMessageText(attributes["gen_ai.input.messages"]);
     trace.output = lastMessageText(attributes["gen_ai.output.messages"]);
-    trace.tokenUsage.prompt += attributes["gen_ai.usage.input_tokens"] ?? 0;
-    trace.tokenUsage.completion += attributes["gen_ai.usage.output_tokens"] ?? 0;
+    const inputTokens = attributes["gen_ai.usage.input_tokens"] ?? 0;
+    const outputTokens = attributes["gen_ai.usage.output_tokens"] ?? 0;
+    trace.tokenUsage.prompt += inputTokens;
+    trace.tokenUsage.completion += outputTokens;
     trace.tokenUsage.total += attributes["gen_ai.usage.total_tokens"] ?? 0;
-    console.log(`  LLM call: ${trace.model} | ${trace.tokenUsage.prompt} in / ${trace.tokenUsage.completion} out tokens | "${trace.input}"`);
+    trace.cost += calculateCost(trace.model, inputTokens, outputTokens);
+    console.log(`  LLM call: ${trace.model} | ${inputTokens} in / ${outputTokens} out tokens | $${trace.cost.toFixed(6)} | "${trace.input}"`);
   }
 
   await trace.save();

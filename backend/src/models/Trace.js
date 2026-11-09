@@ -38,7 +38,7 @@ const traceSchema = new mongoose.Schema(
       completion: { type: Number, default: 0 },
       total: { type: Number, default: 0 },
     },
-    cost: { type: Number, default: 0 }, // next phase
+    cost: { type: Number, default: 0 }, // in USD
     spans: [spanSchema],
     evaluation: { // next phase
       score: { type: Number, default: null },
