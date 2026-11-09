@@ -25,6 +25,31 @@ export async function listTraces(req, res) {
   res.json({ traces, total, page, limit });
 }
 
+// One row per model, busiest first
+export async function getModelStats(req, res) {
+  const applicationIds = await getUserApplicationIds(req.user.id);
+
+  const stats = await Trace.aggregate([
+    { $match: { application: { $in: applicationIds }, model: { $ne: null } } },
+    { $sort: { createdAt: 1 } },
+    {
+      $group: {
+        _id: "$model",
+        calls: { $sum: 1 },
+        errors: { $sum: { $cond: [{ $eq: ["$status", "error"] }, 1, 0] } },
+        avgLatencyMs: { $avg: "$durationMs" },
+        totalTokens: { $sum: "$tokenUsage.total" },
+        totalCost: { $sum: "$cost" },
+        recentLatencies: { $lastN: { input: "$durationMs", n: 10 } }, // for the small chart
+      },
+    },
+    { $sort: { calls: -1 } },
+    { $limit: 3 },
+  ]);
+
+  res.json(stats);
+}
+
 export async function getTrace(req, res) {
   const applicationIds = await getUserApplicationIds(req.user.id);
   // Must belong to user's app

@@ -5,7 +5,6 @@ import UsageChart from "../components/UsageChart.jsx";
 import ModelCard from "../components/ModelCard.jsx";
 import HeroCard from "../components/HeroCard.jsx";
 import TraceDetailPanel from "../components/TraceDetailPanel.jsx";
-import { modelStats } from "../utils/dummyData.js";
 import api from "../utils/api.js";
 import {
   totalTraces,
@@ -14,9 +13,12 @@ import {
   totalCostUsd,
 } from "../utils/metrics.js";
 
+const colors = ["#818cf8", "#f472b6", "#34d399"];
+
 export default function Dashboard() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [traces, setTraces] = useState([]);
+  const [modelStats, setModelStats] = useState([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -24,6 +26,11 @@ export default function Dashboard() {
       .get("/traces")
       .then((res) => setTraces(res.data.traces))
       .catch((err) => setError(err.response?.data?.error || "Could not load traces"));
+
+    api
+      .get("/traces/stats")
+      .then((res) => setModelStats(res.data))
+      .catch((err) => setError(err.response?.data?.error || "Could not load model stats"));
   }, []);
 
   const filteredTraces = useMemo(() => {
@@ -60,9 +67,12 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
-          {modelStats.map((m, i) => (
-            <ModelCard key={m.name} {...m} delay={i * 80} />
+          {modelStats.map((model, i) => (
+            <ModelCard key={model._id} model={model} color={colors[i]} delay={i * 80} />
           ))}
+          {modelStats.length === 0 && (
+            <p className="text-sm text-slate-500">No model calls yet.</p>
+          )}
         </div>
         <HeroCard />
       </div>
@@ -83,9 +93,6 @@ export default function Dashboard() {
       <TraceTable traces={filteredTraces} />
 
       {error && <p className="text-xs text-red-400">{error}</p>}
-      <p className="text-xs text-slate-600">
-        Model cards above still show placeholder demo data.
-      </p>
     </div>
   );
 }
