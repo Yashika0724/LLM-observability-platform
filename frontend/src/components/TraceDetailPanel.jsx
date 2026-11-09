@@ -42,6 +42,16 @@ export default function TraceDetailPanel({ trace }) {
           <p className="text-slate-200">${trace.cost.toFixed(4)}</p>
         </div>
       </div>
+      <div className="mt-4 text-sm">
+        <p className="text-slate-500 text-xs">Quality</p>
+        {trace.evaluation?.score ? (
+          <p className="text-slate-200">
+            {trace.evaluation.score}/5 · {trace.evaluation.rationale}
+          </p>
+        ) : (
+          <p className="text-slate-500">Not evaluated yet</p>
+        )}
+      </div>
     </div>
   );
 }

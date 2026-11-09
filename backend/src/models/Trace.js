@@ -40,8 +40,8 @@ const traceSchema = new mongoose.Schema(
     },
     cost: { type: Number, default: 0 }, // in USD
     spans: [spanSchema],
-    evaluation: { // next phase
-      score: { type: Number, default: null },
+    evaluation: { // filled by evaluation-service
+      score: { type: Number, default: null }, // 1 to 5
       rationale: { type: String, default: null },
     },
   },

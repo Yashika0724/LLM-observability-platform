@@ -6,14 +6,14 @@ export default function HeroCard() {
       <div>
         <span className="inline-flex items-center gap-1 text-xs bg-white/10 px-2 py-1 rounded-full">
           <Sparkles size={12} />
-          Planned — Week 3
+          Live
         </span>
         <h3 className="text-lg font-display font-semibold mt-4">
           LLM Evaluation Insights
         </h3>
         <p className="text-sm text-white/70 mt-2">
-          Automated relevance and quality scoring for every traced response,
-          surfaced here once the evaluation service is integrated.
+          Every traced response is scored 1 to 5 for relevance by an LLM judge.
+          See the Quality column in the trace table.
         </p>
       </div>
       <div className="space-y-2 mt-6">

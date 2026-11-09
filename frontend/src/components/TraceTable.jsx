@@ -11,6 +11,7 @@ export default function TraceTable({ traces }) {
             <th className="px-4 py-3">Tokens</th>
             <th className="px-4 py-3">Latency</th>
             <th className="px-4 py-3">Cost</th>
+            <th className="px-4 py-3">Quality</th>
             <th className="px-4 py-3">Status</th>
             <th className="px-4 py-3">Time</th>
           </tr>
@@ -29,6 +30,9 @@ export default function TraceTable({ traces }) {
               <td className="px-4 py-3 text-slate-400">{t.durationMs} ms</td>
               <td className="px-4 py-3 text-slate-400">
                 ${t.cost.toFixed(4)}
+              </td>
+              <td className="px-4 py-3 text-slate-400" title={t.evaluation?.rationale}>
+                {t.evaluation?.score ? `${t.evaluation.score}/5` : "–"}
               </td>
               <td className="px-4 py-3">
                 <StatusBadge status={t.status} />

@@ -2,6 +2,7 @@ import { fileURLToPath } from "url";
 import protobuf from "protobufjs";
 import Trace from "../models/Trace.js";
 import { calculateCost } from "../utils/pricing.js";
+import { addEvalJob } from "../utils/queue.js";
 
 // Load OTLP format for decoding
 const protoPath = fileURLToPath(new URL("../proto/trace.proto", import.meta.url));
@@ -83,6 +84,13 @@ async function saveSpan(applicationId, span) {
 
   await trace.save();
   console.log(`  saved span "${span.name}" (${endTime - startTime} ms) -> trace ${traceId.slice(0, 8)}`);
+
+  // Queue for quality scoring, without waiting for it
+  if (attributes["gen_ai.operation.name"] && trace.output) {
+    addEvalJob(traceId)
+      .then(() => console.log(`  queued trace ${traceId.slice(0, 8)} for evaluation`))
+      .catch((err) => console.log(`  could not queue trace ${traceId.slice(0, 8)}: ${err.message}`));
+  }
 }
 
 export async function ingestTraces(req, res) {
