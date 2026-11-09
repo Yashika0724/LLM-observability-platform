@@ -3,6 +3,9 @@ import { generateApiKey, hashApiKey } from "../utils/apiKey.js";
 
 export async function createApplication(req, res) {
   const { name } = req.body;
+  if (!name) {
+    return res.status(400).json({ error: "App name is required" });
+  }
 
   const rawKey = generateApiKey();
   const application = await Application.create({

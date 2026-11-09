@@ -6,10 +6,12 @@ import {
   Sparkles,
   Cpu,
   Settings,
+  KeyRound,
 } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard", enabled: true, icon: LayoutDashboard },
+  { label: "Applications", path: "/applications", enabled: true, icon: KeyRound },
   { label: "Traces", enabled: false, icon: GitBranch },
   { label: "Evaluations", enabled: false, icon: Sparkles },
   { label: "Models", enabled: false, icon: Cpu },

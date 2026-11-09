@@ -6,6 +6,7 @@ import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import TraceDetail from "./pages/TraceDetail.jsx";
+import Applications from "./pages/Applications.jsx";
 
 export default function App() {
   const location = useLocation();
@@ -37,6 +38,7 @@ export default function App() {
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/traces/:traceId" element={<TraceDetail />} />
+            <Route path="/applications" element={<Applications />} />
           </Routes>
         </div>
       </div>
