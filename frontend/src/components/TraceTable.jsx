@@ -1,6 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import StatusBadge from "./StatusBadge.jsx";
 
 export default function TraceTable({ traces }) {
+  const navigate = useNavigate();
+
   return (
     <div className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg shadow-black/20 rounded-xl overflow-x-auto opacity-0 animate-fadeInUp" style={{ animationDelay: "300ms" }}>
       <table className="w-full text-sm text-left">
@@ -20,7 +23,8 @@ export default function TraceTable({ traces }) {
           {traces.map((t) => (
             <tr
               key={t.traceId}
-              className="border-t border-white/10 transition-colors duration-150 hover:bg-white/5"
+              onClick={() => navigate(`/traces/${t.traceId}`)}
+              className="border-t border-white/10 transition-colors duration-150 hover:bg-white/5 cursor-pointer"
             >
               <td className="px-4 py-3 text-slate-200 max-w-xs truncate">
                 {t.input}
