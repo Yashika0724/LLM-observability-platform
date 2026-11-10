@@ -33,6 +33,16 @@ export default function Dashboard() {
       .catch((err) => setError(err.response?.data?.error || "Could not load model stats"));
   }, []);
 
+  async function handleExport() {
+    const res = await api.get("/traces/export", { responseType: "blob" });
+    const url = URL.createObjectURL(res.data); // temporary link to the file
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "traces.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
   const filteredTraces = useMemo(() => {
     if (statusFilter === "all") return traces;
     return traces.filter((t) => t.status === statusFilter);
@@ -54,15 +64,23 @@ export default function Dashboard() {
             Top Models by Usage
           </h2>
         </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg px-3 py-2 text-sm text-slate-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/40"
-        >
-          <option value="all">All statuses</option>
-          <option value="success">Success</option>
-          <option value="error">Error</option>
-        </select>
+        <div className="flex gap-3">
+          <button
+            onClick={handleExport}
+            className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white transition"
+          >
+            Export CSV
+          </button>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg px-3 py-2 text-sm text-slate-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/40"
+          >
+            <option value="all">All statuses</option>
+            <option value="success">Success</option>
+            <option value="error">Error</option>
+          </select>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">

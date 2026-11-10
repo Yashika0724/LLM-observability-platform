@@ -50,6 +50,38 @@ export async function getModelStats(req, res) {
   res.json(stats);
 }
 
+// Wrap in quotes so commas and quotes inside text don't break the CSV
+function csvCell(value) {
+  return `"${String(value ?? "").replace(/"/g, '""')}"`;
+}
+
+export async function exportTraces(req, res) {
+  const applicationIds = await getUserApplicationIds(req.user.id);
+  const traces = await Trace.find({ application: { $in: applicationIds }, model: { $ne: null } })
+    .select("-spans")
+    .sort({ createdAt: -1 });
+
+  const header = "time,model,prompt,status,latency_ms,tokens,cost_usd,quality_score";
+  const rows = traces.map((t) =>
+    [
+      t.createdAt.toISOString(),
+      t.model,
+      t.input,
+      t.status,
+      t.durationMs,
+      t.tokenUsage.total,
+      t.cost,
+      t.evaluation?.score,
+    ]
+      .map(csvCell)
+      .join(",")
+  );
+
+  res.attachment("traces.csv"); // tells the browser to download it
+  res.type("text/csv");
+  res.send([header, ...rows].join("\n"));
+}
+
 export async function getTrace(req, res) {
   const applicationIds = await getUserApplicationIds(req.user.id);
   // Must belong to user's app
