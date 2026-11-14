@@ -7,6 +7,7 @@ import {
   Cpu,
   Settings,
   KeyRound,
+  ShieldCheck,
 } from "lucide-react";
 
 const navItems = [
@@ -20,6 +21,11 @@ const navItems = [
 
 export default function Sidebar() {
   const location = useLocation();
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const items =
+    user.role === "admin"
+      ? [...navItems, { label: "Admin", path: "/admin", enabled: true, icon: ShieldCheck }]
+      : navItems;
 
   return (
     <aside className="w-60 bg-white/5 backdrop-blur-xl border-r border-white/10 flex flex-col justify-between p-5 min-h-screen shrink-0">
@@ -36,7 +42,7 @@ export default function Sidebar() {
           </div>
         </div>
         <nav className="space-y-1">
-          {navItems.map((item) => {
+          {items.map((item) => {
             const Icon = item.icon;
             return item.enabled ? (
               <Link

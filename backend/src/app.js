@@ -5,6 +5,7 @@ import authRoutes from "./routes/authRoutes.js";
 import applicationRoutes from "./routes/applicationRoutes.js";
 import ingestRoutes from "./routes/ingestRoutes.js";
 import traceRoutes from "./routes/traceRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.get("/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/traces", traceRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Trace ingestion (API key)
 app.use("/v1", ingestRoutes);
