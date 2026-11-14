@@ -59,6 +59,21 @@ uvicorn app.main:app --port 8001
 cd frontend && npm install && npm run dev
 ```
 
+## Deploy online (Render + MongoDB Atlas)
+
+`render.yaml` describes the whole platform for Render: backend, evaluation-service, frontend and a Redis instance. Everything uses free plans.
+
+1. **MongoDB Atlas:** create a free M0 cluster and a database user. Under Network Access, allow `0.0.0.0/0`, because Render's IP addresses change. Copy the connection string and add the database name before the `?`:
+   `mongodb+srv://<user>:<password>@<cluster>.mongodb.net/llm-observability?retryWrites=true&w=majority`
+2. **Render:** go to New → Blueprint, connect this GitHub repo and fill in the values it asks for:
+   - `MONGODB_URI` (for both services): the Atlas string from step 1
+   - `OPENROUTER_API_KEY` and `JUDGE_MODEL`: the same values as in `evaluation-service/.env`
+   - `VITE_API_URL`: `https://llm-obs-backend.onrender.com`
+3. When the deploy finishes, check the backend's real URL on its Render page. If it isn't the one you entered, update `VITE_API_URL` on the frontend service and redeploy the frontend.
+4. Open the frontend's URL. That's the demo link.
+
+Free Render services go to sleep after 15 minutes without traffic, and the first request then takes about a minute to wake them. Before a demo, open the backend and evaluation-service `/health` URLs once so both are awake.
+
 ## Sending traces
 
-Create an application on the Applications page to get an API key. Then send OTLP traces to `http://localhost:8000/v1/traces` with the header `x-api-key: <your key>`.
+Create an application on the Applications page to get an API key. Then send OTLP traces to `<backend URL>/v1/traces` (`http://localhost:8000/v1/traces` when running locally) with the header `x-api-key: <your key>`.

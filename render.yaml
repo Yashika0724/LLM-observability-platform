@@ -1,0 +1,60 @@
+# Render Blueprint: creates the whole platform on Render from this one file.
+# MongoDB is not here; it runs on MongoDB Atlas (free) and its URL is pasted in as MONGODB_URI.
+
+services:
+  - type: web
+    name: llm-obs-backend
+    runtime: docker
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: MONGODB_URI
+        sync: false # asked for when the Blueprint is created
+      - key: JWT_SECRET
+        generateValue: true # Render makes a random secret
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: llm-obs-redis
+          property: connectionString
+
+  - type: web
+    name: llm-obs-eval
+    runtime: docker
+    dockerContext: ./evaluation-service
+    dockerfilePath: ./evaluation-service/Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: JUDGE_MODEL
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: llm-obs-redis
+          property: connectionString
+
+  - type: web
+    name: llm-obs-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite # let React Router handle /traces, /admin, ...
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        sync: false # the backend's Render URL, e.g. https://llm-obs-backend.onrender.com
+
+  - type: keyvalue # Redis, used as the evaluation job queue
+    name: llm-obs-redis
+    plan: free
+    ipAllowList: [] # no outside access, only the services above
