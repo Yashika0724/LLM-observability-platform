@@ -2,6 +2,10 @@
 
 Full-stack LLM Observability Platform for tracing, evaluation, cost and performance monitoring.
 
+**Live demo:** https://llm-obs-frontend.onrender.com
+
+It runs on Render's free plan, so the first visit after a quiet period can take about a minute while the services wake up.
+
 ## Services
 
 | Service | Tech | Port |
