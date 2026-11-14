@@ -4,19 +4,15 @@ import {
   LayoutDashboard,
   GitBranch,
   Sparkles,
-  Cpu,
-  Settings,
   KeyRound,
   ShieldCheck,
 } from "lucide-react";
 
 const navItems = [
-  { label: "Dashboard", path: "/dashboard", enabled: true, icon: LayoutDashboard },
-  { label: "Applications", path: "/applications", enabled: true, icon: KeyRound },
-  { label: "Traces", path: "/traces", enabled: true, icon: GitBranch },
-  { label: "Evaluations", path: "/evaluations", enabled: true, icon: Sparkles },
-  { label: "Models", enabled: false, icon: Cpu },
-  { label: "Settings", enabled: false, icon: Settings },
+  { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { label: "Applications", path: "/applications", icon: KeyRound },
+  { label: "Traces", path: "/traces", icon: GitBranch },
+  { label: "Evaluations", path: "/evaluations", icon: Sparkles },
 ];
 
 export default function Sidebar() {
@@ -24,11 +20,11 @@ export default function Sidebar() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const items =
     user.role === "admin"
-      ? [...navItems, { label: "Admin", path: "/admin", enabled: true, icon: ShieldCheck }]
+      ? [...navItems, { label: "Admin", path: "/admin", icon: ShieldCheck }]
       : navItems;
 
   return (
-    <aside className="w-60 bg-white/5 backdrop-blur-xl border-r border-white/10 flex flex-col justify-between p-5 min-h-screen shrink-0">
+    <aside className="w-60 bg-white/5 backdrop-blur-xl border-r border-white/10 flex flex-col p-5 min-h-screen shrink-0">
       <div>
         <div className="flex items-center gap-2 mb-8">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
@@ -44,7 +40,7 @@ export default function Sidebar() {
         <nav className="space-y-1">
           {items.map((item) => {
             const Icon = item.icon;
-            return item.enabled ? (
+            return (
               <Link
                 key={item.label}
                 to={item.path}
@@ -57,24 +53,10 @@ export default function Sidebar() {
                 <Icon size={16} />
                 {item.label}
               </Link>
-            ) : (
-              <div
-                key={item.label}
-                className="flex items-center justify-between px-3 py-2 rounded-lg text-sm text-slate-600 cursor-not-allowed"
-              >
-                <span className="flex items-center gap-2">
-                  <Icon size={16} />
-                  {item.label}
-                </span>
-                <span className="text-[10px] bg-white/10 text-slate-500 px-2 py-0.5 rounded-full">
-                  soon
-                </span>
-              </div>
             );
           })}
         </nav>
       </div>
-      <p className="text-xs text-slate-600">Week 1 Scaffold</p>
     </aside>
   );
 }

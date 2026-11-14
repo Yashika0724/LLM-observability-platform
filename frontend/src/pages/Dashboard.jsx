@@ -60,7 +60,7 @@ export default function Dashboard() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs text-slate-500">Recommended view · last 24 hours</p>
+          <p className="text-xs text-slate-500">Recommended view · latest traces</p>
           <h2 className="text-xl font-display font-semibold text-white">
             Top Models by Usage
           </h2>
