@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import StatusBadge from "./StatusBadge.jsx";
+import { formatCost } from "../utils/metrics.js";
 
 export default function TraceDetailPanel({ trace }) {
   if (!trace) {
@@ -10,7 +11,7 @@ export default function TraceDetailPanel({ trace }) {
     ["Model", trace.model],
     ["Tokens", trace.tokenUsage.total],
     ["Latency", `${trace.durationMs} ms`],
-    ["Cost", `$${trace.cost.toFixed(4)}`],
+    ["Cost", formatCost(trace.cost)],
   ];
 
   return (

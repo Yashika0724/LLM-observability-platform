@@ -1,5 +1,6 @@
 import { Line } from "react-chartjs-2";
 import "../utils/chartSetup.js";
+import { formatCost } from "../utils/metrics.js";
 
 export default function ModelCard({ model, color }) {
   const errorRate = ((model.errors / model.calls) * 100).toFixed(1);
@@ -32,7 +33,7 @@ export default function ModelCard({ model, color }) {
       </div>
       <p className="text-2xl font-bold tracking-tight mt-4">{Math.round(model.avgLatencyMs)} ms</p>
       <p className="text-xs text-slate-500 mt-1">
-        avg latency · {model.calls} calls · ${model.totalCost.toFixed(4)} · {errorRate}% errors
+        avg latency · {model.calls} calls · {formatCost(model.pricedCalls ? model.totalCost : null)} · {errorRate}% errors
       </p>
       <div className="h-12 mt-4">
         <Line data={data} options={options} />

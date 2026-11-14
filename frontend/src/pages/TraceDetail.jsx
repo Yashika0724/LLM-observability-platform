@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import api from "../utils/api.js";
 import StatusBadge from "../components/StatusBadge.jsx";
 import Waterfall from "../components/Waterfall.jsx";
+import { formatCost } from "../utils/metrics.js";
 
 export default function TraceDetail() {
   const { traceId } = useParams();
@@ -24,7 +25,7 @@ export default function TraceDetail() {
     ["Model", trace.model],
     ["Latency", `${trace.durationMs} ms`],
     ["Tokens", trace.tokenUsage.total],
-    ["Cost", `$${trace.cost.toFixed(4)}`],
+    ["Cost", formatCost(trace.cost)],
     ["Quality", trace.evaluation?.score ? `${trace.evaluation.score}/5` : "–"],
   ];
 

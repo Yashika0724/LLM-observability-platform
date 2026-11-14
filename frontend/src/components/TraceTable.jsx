@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import StatusBadge from "./StatusBadge.jsx";
+import { formatCost } from "../utils/metrics.js";
 
 export default function TraceTable({ traces }) {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export default function TraceTable({ traces }) {
               <td className="px-4 py-3.5 text-slate-600">{t.model}</td>
               <td className="px-4 py-3.5 text-slate-600">{t.tokenUsage.total}</td>
               <td className="px-4 py-3.5 text-slate-600">{t.durationMs} ms</td>
-              <td className="px-4 py-3.5 text-slate-600">${t.cost.toFixed(4)}</td>
+              <td className="px-4 py-3.5 text-slate-600">{formatCost(t.cost)}</td>
               <td className="px-4 py-3.5 text-slate-600" title={t.evaluation?.rationale}>
                 {t.evaluation?.score ? `${t.evaluation.score}/5` : "–"}
               </td>

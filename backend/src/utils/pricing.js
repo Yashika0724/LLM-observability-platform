@@ -5,9 +5,12 @@ const prices = {
   "meta-llama/llama-3.1-8b-instruct": { input: 0.02, output: 0.05 },
 };
 
+// Returns the cost in USD, or null when the model's price is not known
 export function calculateCost(model, inputTokens, outputTokens) {
+  if (model?.endsWith(":free")) return 0; // OpenRouter free models really cost nothing
+
   const price = prices[model];
-  if (!price) return 0; // free or unknown model
+  if (!price) return null; // unknown, so don't pretend it is $0
 
   return (inputTokens * price.input + outputTokens * price.output) / 1000000;
 }

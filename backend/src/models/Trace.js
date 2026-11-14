@@ -38,7 +38,7 @@ const traceSchema = new mongoose.Schema(
       completion: { type: Number, default: 0 },
       total: { type: Number, default: 0 },
     },
-    cost: { type: Number, default: 0 }, // in USD
+    cost: { type: Number, default: 0 }, // in USD, null = model price unknown
     spans: [spanSchema],
     evaluation: { // filled by evaluation-service
       score: { type: Number, default: null }, // 1 to 5

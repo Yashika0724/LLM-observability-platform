@@ -9,7 +9,7 @@ import ModelCard from "../components/ModelCard.jsx";
 import HeroCard from "../components/HeroCard.jsx";
 import TraceDetailPanel from "../components/TraceDetailPanel.jsx";
 import api from "../utils/api.js";
-import { totalTraces, avgLatencyMs, totalTokens, totalCostUsd } from "../utils/metrics.js";
+import { totalTraces, avgLatencyMs, totalTokens, totalCostUsd, formatCost } from "../utils/metrics.js";
 
 const colors = ["#7C6CD8", "#E57FA8", "#4FA36F"];
 
@@ -58,7 +58,7 @@ export default function Dashboard() {
     { label: "Total traces", value: totalTraces(filteredTraces), icon: GitBranch, tone: "bg-lavender" },
     { label: "Avg latency", value: `${avgLatencyMs(filteredTraces)} ms`, icon: Timer, tone: "bg-mint" },
     { label: "Total tokens", value: totalTokens(filteredTraces), icon: Coins, tone: "bg-cream" },
-    { label: "Estimated cost", value: `$${totalCostUsd(filteredTraces)}`, icon: DollarSign, tone: "bg-blush" },
+    { label: "Estimated cost", value: formatCost(totalCostUsd(filteredTraces)), icon: DollarSign, tone: "bg-blush" },
   ];
 
   return (

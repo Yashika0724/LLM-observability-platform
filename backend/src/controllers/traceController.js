@@ -48,7 +48,8 @@ export async function getModelStats(req, res) {
         errors: { $sum: { $cond: [{ $eq: ["$status", "error"] }, 1, 0] } },
         avgLatencyMs: { $avg: "$durationMs" },
         totalTokens: { $sum: "$tokenUsage.total" },
-        totalCost: { $sum: "$cost" },
+        totalCost: { $sum: "$cost" }, // $sum skips unknown (null) costs
+        pricedCalls: { $sum: { $cond: [{ $eq: ["$cost", null] }, 0, 1] } },
         recentLatencies: { $lastN: { input: "$durationMs", n: 10 } }, // for the small chart
       },
     },
@@ -95,9 +96,12 @@ export async function getTrends(req, res) {
       $group: {
         _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
         cost: { $sum: "$cost" },
+        pricedTraces: { $sum: { $cond: [{ $eq: ["$cost", null] }, 0, 1] } },
         avgScore: { $avg: "$evaluation.score" }, // $avg skips traces not yet evaluated
       },
     },
+    // No known cost that day -> null, so the chart shows a gap instead of $0
+    { $set: { cost: { $cond: [{ $gt: ["$pricedTraces", 0] }, "$cost", null] } } },
     { $sort: { _id: 1 } },
   ]);
 

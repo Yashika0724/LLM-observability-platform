@@ -78,8 +78,11 @@ async function saveSpan(applicationId, span) {
     trace.tokenUsage.prompt += inputTokens;
     trace.tokenUsage.completion += outputTokens;
     trace.tokenUsage.total += attributes["gen_ai.usage.total_tokens"] ?? 0;
-    trace.cost += calculateCost(trace.model, inputTokens, outputTokens);
-    console.log(`  LLM call: ${trace.model} | ${inputTokens} in / ${outputTokens} out tokens | $${trace.cost.toFixed(6)} | "${trace.input}"`);
+    const callCost = calculateCost(trace.model, inputTokens, outputTokens);
+    // One call with an unknown price makes the whole trace's cost unknown
+    trace.cost = callCost === null || trace.cost === null ? null : trace.cost + callCost;
+    const costText = trace.cost === null ? "cost unknown" : `$${trace.cost.toFixed(6)}`;
+    console.log(`  LLM call: ${trace.model} | ${inputTokens} in / ${outputTokens} out tokens | ${costText} | "${trace.input}"`);
   }
 
   await trace.save();
