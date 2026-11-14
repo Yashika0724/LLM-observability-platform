@@ -12,7 +12,7 @@ import {
 const navItems = [
   { label: "Dashboard", path: "/dashboard", enabled: true, icon: LayoutDashboard },
   { label: "Applications", path: "/applications", enabled: true, icon: KeyRound },
-  { label: "Traces", enabled: false, icon: GitBranch },
+  { label: "Traces", path: "/traces", enabled: true, icon: GitBranch },
   { label: "Evaluations", enabled: false, icon: Sparkles },
   { label: "Models", enabled: false, icon: Cpu },
   { label: "Settings", enabled: false, icon: Settings },
