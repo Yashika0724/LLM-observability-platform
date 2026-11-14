@@ -5,6 +5,7 @@ import BackgroundGlow from "./components/BackgroundGlow.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import Traces from "./pages/Traces.jsx";
 import TraceDetail from "./pages/TraceDetail.jsx";
 import Applications from "./pages/Applications.jsx";
 
@@ -37,6 +38,7 @@ export default function App() {
         <div key={location.pathname} className="opacity-0 animate-fadeInUp">
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/traces" element={<Traces />} />
             <Route path="/traces/:traceId" element={<TraceDetail />} />
             <Route path="/applications" element={<Applications />} />
           </Routes>

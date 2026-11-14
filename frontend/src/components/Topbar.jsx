@@ -11,6 +11,12 @@ export default function Topbar() {
     .slice(0, 2)
     .toUpperCase();
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const text = e.target.search.value.trim();
+    navigate(text ? `/traces?q=${encodeURIComponent(text)}` : "/traces");
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -26,17 +32,18 @@ export default function Topbar() {
         </h2>
       </div>
       <div className="flex items-center gap-3">
-        <div className="relative">
+        <form onSubmit={handleSearch} className="relative">
           <Search
             size={14}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
           />
           <input
+            name="search"
             type="text"
             placeholder="Search traces..."
             className="bg-white/5 border border-white/10 rounded-lg pl-8 pr-3 py-2 text-sm text-slate-300 placeholder-slate-600 w-56 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/40"
           />
-        </div>
+        </form>
         <button className="relative w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all duration-200">
           <Bell size={16} />
           <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-pink-400" />

@@ -10,9 +10,17 @@ async function getUserApplicationIds(userId) {
 export async function listTraces(req, res) {
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 20;
+  const { status, model, q } = req.query;
 
   const applicationIds = await getUserApplicationIds(req.user.id);
-  const filter = { application: { $in: applicationIds }, model: { $ne: null } };
+  const baseFilter = { application: { $in: applicationIds }, model: { $ne: null } };
+  const filter = { ...baseFilter };
+  if (status) filter.status = status;
+  if (model) filter.model = model;
+  if (q) {
+    const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // treat search text as plain text, not regex
+    filter.input = { $regex: escaped, $options: "i" };
+  }
 
   const traces = await Trace.find(filter)
     .select("-spans") // smaller response
@@ -20,9 +28,10 @@ export async function listTraces(req, res) {
     .skip((page - 1) * limit) // pagination
     .limit(limit);
   const total = await Trace.countDocuments(filter);
+  const models = await Trace.distinct("model", baseFilter); // for the model filter dropdown
   console.log(`[dashboard] sending ${traces.length} of ${total} traces (page ${page})`);
 
-  res.json({ traces, total, page, limit });
+  res.json({ traces, total, page, limit, models });
 }
 
 // One row per model, busiest first
