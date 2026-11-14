@@ -84,6 +84,26 @@ export async function getEvaluations(req, res) {
   res.json({ total, averageScore, scoreCounts, recent });
 }
 
+// Daily cost and average quality score for the last 14 days
+export async function getTrends(req, res) {
+  const applicationIds = await getUserApplicationIds(req.user.id);
+  const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+
+  const days = await Trace.aggregate([
+    { $match: { application: { $in: applicationIds }, model: { $ne: null }, createdAt: { $gte: since } } },
+    {
+      $group: {
+        _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+        cost: { $sum: "$cost" },
+        avgScore: { $avg: "$evaluation.score" }, // $avg skips traces not yet evaluated
+      },
+    },
+    { $sort: { _id: 1 } },
+  ]);
+
+  res.json(days);
+}
+
 // Wrap in quotes so commas and quotes inside text don't break the CSV
 function csvCell(value) {
   return `"${String(value ?? "").replace(/"/g, '""')}"`;

@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import KpiCard from "../components/KpiCard.jsx";
 import TraceTable from "../components/TraceTable.jsx";
 import UsageChart from "../components/UsageChart.jsx";
+import TrendChart from "../components/TrendChart.jsx";
 import ModelCard from "../components/ModelCard.jsx";
 import HeroCard from "../components/HeroCard.jsx";
 import TraceDetailPanel from "../components/TraceDetailPanel.jsx";
@@ -107,6 +108,8 @@ export default function Dashboard() {
           <KpiCard key={kpi.label} label={kpi.label} value={kpi.value} delay={i * 80} />
         ))}
       </div>
+
+      <TrendChart />
 
       <TraceTable traces={filteredTraces} />
 
