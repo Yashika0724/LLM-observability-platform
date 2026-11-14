@@ -1,0 +1,49 @@
+# Runs the whole platform: docker compose up --build
+# Inside Docker, services reach each other by name (mongo, redis), not 127.0.0.1,
+# so those two URLs are overridden here. Everything else comes from each service's .env.
+# mongo and redis have no ports open on your Mac, so they never clash with a local install.
+
+services:
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo-data:/data/db # keeps data when containers are removed
+
+  redis:
+    image: redis:7-alpine
+
+  backend:
+    build: ./backend
+    env_file: ./backend/.env
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/llm-observability
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "8000:8000"
+    restart: on-failure # retry if mongo/redis weren't ready yet
+    depends_on:
+      - mongo
+      - redis
+
+  evaluation-service:
+    build: ./evaluation-service
+    env_file: ./evaluation-service/.env
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/llm-observability
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "8001:8001"
+    restart: on-failure
+    depends_on:
+      - mongo
+      - redis
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:
