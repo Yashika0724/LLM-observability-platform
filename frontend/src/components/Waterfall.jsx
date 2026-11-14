@@ -27,25 +27,22 @@ export default function Waterfall({ trace }) {
         const color =
           span.status === "error"
             ? "bg-red-400"
-            : span.attributes["gen_ai.operation.name"]
-              ? "bg-violet-400" // LLM call
-              : "bg-indigo-400";
+            : span.attributes?.["gen_ai.operation.name"] // empty attributes are left out of the JSON
+              ? "bg-accent" // LLM call
+              : "bg-ink";
 
         return (
           <div key={span.spanId} className="flex items-center gap-4 text-xs">
-            <p
-              className="w-56 shrink-0 truncate text-slate-300"
-              style={{ paddingLeft: span.depth * 16 }}
-            >
+            <p className="w-56 shrink-0 truncate text-slate-700" style={{ paddingLeft: span.depth * 16 }}>
               {span.name}
             </p>
-            <div className="flex-1 h-5 bg-white/5 rounded relative">
+            <div className="flex-1 h-5 bg-canvas rounded-md relative">
               <div
-                className={`absolute h-full rounded ${color}`}
+                className={`absolute h-full rounded-md ${color}`}
                 style={{ left: `${left}%`, width: `${width}%` }}
               />
             </div>
-            <p className="w-20 shrink-0 text-right text-slate-400">{span.durationMs} ms</p>
+            <p className="w-20 shrink-0 text-right text-slate-500">{span.durationMs} ms</p>
           </div>
         );
       })}

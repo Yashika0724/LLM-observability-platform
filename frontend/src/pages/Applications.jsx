@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "../utils/api.js";
-
-const card = "bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6";
+import api, { API_URL } from "../utils/api.js";
 
 export default function Applications() {
   const [applications, setApplications] = useState([]);
@@ -39,66 +37,66 @@ export default function Applications() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-8">
       <div>
-        <h2 className="text-xl font-display font-semibold text-white">Applications</h2>
+        <h2 className="text-3xl font-bold tracking-tight">Applications</h2>
         <p className="text-sm text-slate-500">
           Each app gets its own API key. Your LLM app sends traces using this key.
         </p>
       </div>
 
-      <form onSubmit={handleCreate} className={`${card} flex gap-3`}>
+      <form onSubmit={handleCreate} className="card p-6 flex gap-3">
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="App name, e.g. support-bot"
-          className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+          className="field flex-1"
         />
-        <button className="bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-medium rounded-lg px-4">
+        <button className="btn">
           Create app
         </button>
       </form>
 
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       {newKey && (
-        <div className={`${card} border-indigo-500/40`}>
-          <p className="text-sm text-white font-medium">Your API key</p>
-          <p className="text-xs text-slate-400 mb-3">
+        <div className="bg-lavender rounded-2xl p-6">
+          <p className="font-semibold">Your API key</p>
+          <p className="text-xs text-slate-500 mb-3">
             Copy it now. It is shown only once and cannot be recovered.
           </p>
           <div className="flex gap-3">
-            <code className="flex-1 bg-black/40 rounded-lg px-3 py-2 text-sm text-indigo-300 break-all">
+            <code className="flex-1 bg-white rounded-xl px-3 py-2 text-sm text-accent break-all">
               {newKey}
             </code>
             <button
               onClick={handleCopy}
-              className="bg-white/10 hover:bg-white/20 active:scale-95 transition text-white text-sm rounded-lg px-4"
+              className="btn"
             >
               {copied ? "Copied ✓" : "Copy"}
             </button>
           </div>
-          <p className="text-xs text-slate-400 mt-3">
-            Send traces to <code className="text-slate-200">http://localhost:8000/v1/traces</code> with
-            the header <code className="text-slate-200">x-api-key: &lt;your key&gt;</code>.
+          <p className="text-xs text-slate-500 mt-3">
+            Send traces to <code className="text-ink">{API_URL}/v1/traces</code> with
+            the header <code className="text-ink">x-api-key: &lt;your key&gt;</code>.
           </p>
         </div>
       )}
 
-      <div className={card}>
+      <div className="card p-6">
         <table className="w-full text-sm text-left">
-          <thead className="text-slate-500 text-xs uppercase">
+          <thead className="text-xs text-slate-500">
             <tr>
-              <th className="pb-3">Name</th>
-              <th className="pb-3">API key</th>
-              <th className="pb-3">Created</th>
+              <th className="pb-3 font-medium">Name</th>
+              <th className="pb-3 font-medium">API key</th>
+              <th className="pb-3 font-medium">Created</th>
             </tr>
           </thead>
           <tbody>
             {applications.map((app) => (
-              <tr key={app._id} className="border-t border-white/10">
-                <td className="py-3 text-slate-200">{app.name}</td>
-                <td className="py-3 text-slate-400 font-mono">obs_••••{app.keyPreview}</td>
+              <tr key={app._id} className="border-t border-black/5">
+                <td className="py-3 text-ink">{app.name}</td>
+                <td className="py-3 text-slate-500 font-mono">obs_••••{app.keyPreview}</td>
                 <td className="py-3 text-slate-500">{new Date(app.createdAt).toLocaleDateString()}</td>
               </tr>
             ))}

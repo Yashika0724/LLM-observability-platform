@@ -1,55 +1,49 @@
-import { Clock } from "lucide-react";
+import { Link } from "react-router-dom";
 import StatusBadge from "./StatusBadge.jsx";
 
 export default function TraceDetailPanel({ trace }) {
   if (!trace) {
-    return (
-      <div className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg shadow-black/20 rounded-xl p-6 text-sm text-slate-500">
-        No traces match this filter.
-      </div>
-    );
+    return <div className="card p-6 text-sm text-slate-500">No traces match this filter.</div>;
   }
 
+  const stats = [
+    ["Model", trace.model],
+    ["Tokens", trace.tokenUsage.total],
+    ["Latency", `${trace.durationMs} ms`],
+    ["Cost", `$${trace.cost.toFixed(4)}`],
+  ];
+
   return (
-    <div className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg shadow-black/20 rounded-xl p-6 opacity-0 animate-fadeInUp transition-all duration-300 hover:border-white/20">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <p className="flex items-center gap-1 text-xs text-slate-500">
-            <Clock size={12} />
+    <div className="card p-6">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-xs text-slate-500">
             Most recent trace · {new Date(trace.createdAt).toLocaleString()}
           </p>
-          <h3 className="text-lg font-display font-semibold text-white mt-1">
+          <Link to={`/traces/${trace.traceId}`} className="block text-lg font-semibold mt-1 truncate hover:underline">
             {trace.input}
-          </h3>
+          </Link>
         </div>
         <StatusBadge status={trace.status} />
       </div>
-      <p className="text-xs text-slate-500 mb-1">Tokens Used</p>
-      <p className="text-4xl font-display font-bold bg-gradient-to-r from-indigo-300 to-violet-300 bg-clip-text text-transparent mb-4">
-        {trace.tokenUsage.total}
-      </p>
-      <div className="grid grid-cols-3 gap-4 text-sm">
-        <div>
-          <p className="text-slate-500 text-xs">Model</p>
-          <p className="text-slate-200">{trace.model}</p>
-        </div>
-        <div>
-          <p className="text-slate-500 text-xs">Latency</p>
-          <p className="text-slate-200">{trace.durationMs} ms</p>
-        </div>
-        <div>
-          <p className="text-slate-500 text-xs">Cost</p>
-          <p className="text-slate-200">${trace.cost.toFixed(4)}</p>
-        </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
+        {stats.map(([label, value]) => (
+          <div key={label} className="bg-canvas rounded-xl p-3">
+            <p className="text-xs text-slate-500">{label}</p>
+            <p className="text-sm font-semibold mt-1 truncate">{value}</p>
+          </div>
+        ))}
       </div>
-      <div className="mt-4 text-sm">
-        <p className="text-slate-500 text-xs">Quality</p>
+
+      <div className="mt-5 text-sm">
+        <p className="text-xs text-slate-500">Quality</p>
         {trace.evaluation?.score ? (
-          <p className="text-slate-200">
-            {trace.evaluation.score}/5 · {trace.evaluation.rationale}
+          <p className="mt-1">
+            <span className="font-semibold">{trace.evaluation.score}/5</span> · {trace.evaluation.rationale}
           </p>
         ) : (
-          <p className="text-slate-500">Not evaluated yet</p>
+          <p className="mt-1 text-slate-500">Not evaluated yet</p>
         )}
       </div>
     </div>

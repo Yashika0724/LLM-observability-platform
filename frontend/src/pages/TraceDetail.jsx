@@ -5,8 +5,6 @@ import api from "../utils/api.js";
 import StatusBadge from "../components/StatusBadge.jsx";
 import Waterfall from "../components/Waterfall.jsx";
 
-const card = "bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6";
-
 export default function TraceDetail() {
   const { traceId } = useParams();
   const [trace, setTrace] = useState(null);
@@ -19,7 +17,7 @@ export default function TraceDetail() {
       .catch((err) => setError(err.response?.data?.error || "Could not load trace"));
   }, [traceId]);
 
-  if (error) return <p className="p-6 text-sm text-red-400">{error}</p>;
+  if (error) return <p className="p-6 text-sm text-red-600">{error}</p>;
   if (!trace) return <p className="p-6 text-sm text-slate-500">Loading...</p>;
 
   const stats = [
@@ -31,18 +29,18 @@ export default function TraceDetail() {
   ];
 
   return (
-    <div className="p-6 space-y-6">
-      <Link to="/dashboard" className="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-white">
+    <div className="space-y-8">
+      <Link to="/dashboard" className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-ink">
         <ArrowLeft size={14} /> Back to dashboard
       </Link>
 
-      <div className={card}>
+      <div className="card p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs text-slate-500">
               {new Date(trace.createdAt).toLocaleString()} · {trace.traceId}
             </p>
-            <h2 className="text-xl font-display font-semibold text-white mt-1">{trace.input}</h2>
+            <h2 className="text-3xl font-bold tracking-tight mt-1">{trace.input}</h2>
           </div>
           <StatusBadge status={trace.status} />
         </div>
@@ -51,22 +49,22 @@ export default function TraceDetail() {
           {stats.map(([label, value]) => (
             <div key={label}>
               <p className="text-xs text-slate-500">{label}</p>
-              <p className="text-slate-200 truncate">{value}</p>
+              <p className="text-ink truncate">{value}</p>
             </div>
           ))}
         </div>
 
-        {trace.error && <p className="mt-4 text-sm text-red-400">Error: {trace.error}</p>}
+        {trace.error && <p className="mt-4 text-sm text-red-600">Error: {trace.error}</p>}
       </div>
 
-      <div className={card}>
-        <h3 className="text-sm font-semibold text-white mb-4">Timeline</h3>
+      <div className="card p-6">
+        <h3 className="font-semibold mb-4">Timeline</h3>
         <Waterfall trace={trace} />
       </div>
 
-      <div className={card}>
-        <h3 className="text-sm font-semibold text-white mb-2">Answer</h3>
-        <p className="text-sm text-slate-300 whitespace-pre-wrap">{trace.output || "–"}</p>
+      <div className="card p-6">
+        <h3 className="font-semibold mb-2">Answer</h3>
+        <p className="text-sm text-slate-700 whitespace-pre-wrap">{trace.output || "–"}</p>
         {trace.evaluation?.rationale && (
           <p className="text-xs text-slate-500 mt-4">Judge: {trace.evaluation.rationale}</p>
         )}

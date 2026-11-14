@@ -3,11 +3,6 @@ import { useSearchParams } from "react-router-dom";
 import api from "../utils/api.js";
 import TraceTable from "../components/TraceTable.jsx";
 
-const selectStyle =
-  "bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/40";
-const buttonStyle =
-  "bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-slate-300 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed";
-
 export default function Traces() {
   // Filters live in the URL (?status=error&page=2) so the topbar search can link here
   const [params, setParams] = useSearchParams();
@@ -34,16 +29,16 @@ export default function Traces() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-8">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h2 className="text-xl font-display font-semibold text-white">Traces</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Traces</h2>
           <p className="text-sm text-slate-500">
             {data.total} traces
             {search && (
               <>
                 {" "}matching "{search}" ·{" "}
-                <button onClick={() => setFilter("q", "")} className="text-indigo-400 hover:underline">
+                <button onClick={() => setFilter("q", "")} className="text-accent hover:underline">
                   clear
                 </button>
               </>
@@ -54,7 +49,7 @@ export default function Traces() {
           <select
             value={params.get("status") || ""}
             onChange={(e) => setFilter("status", e.target.value)}
-            className={selectStyle}
+            className="field"
           >
             <option value="">All statuses</option>
             <option value="success">Success</option>
@@ -63,7 +58,7 @@ export default function Traces() {
           <select
             value={params.get("model") || ""}
             onChange={(e) => setFilter("model", e.target.value)}
-            className={selectStyle}
+            className="field"
           >
             <option value="">All models</option>
             {data.models.map((model) => (
@@ -82,16 +77,16 @@ export default function Traces() {
           Page {page} of {totalPages}
         </span>
         <div className="flex gap-2">
-          <button disabled={page <= 1} onClick={() => setFilter("page", page - 1)} className={buttonStyle}>
+          <button disabled={page <= 1} onClick={() => setFilter("page", page - 1)} className="btn-light">
             Previous
           </button>
-          <button disabled={page >= totalPages} onClick={() => setFilter("page", page + 1)} className={buttonStyle}>
+          <button disabled={page >= totalPages} onClick={() => setFilter("page", page + 1)} className="btn-light">
             Next
           </button>
         </div>
       </div>
 
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
   );
 }

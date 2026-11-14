@@ -5,18 +5,18 @@ export default function TraceTable({ traces }) {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg shadow-black/20 rounded-xl overflow-x-auto opacity-0 animate-fadeInUp" style={{ animationDelay: "300ms" }}>
+    <div className="card overflow-x-auto">
       <table className="w-full text-sm text-left">
-        <thead className="bg-white/5 text-slate-500 text-xs uppercase">
+        <thead className="text-xs text-slate-400">
           <tr>
-            <th className="px-4 py-3">Prompt</th>
-            <th className="px-4 py-3">Model</th>
-            <th className="px-4 py-3">Tokens</th>
-            <th className="px-4 py-3">Latency</th>
-            <th className="px-4 py-3">Cost</th>
-            <th className="px-4 py-3">Quality</th>
-            <th className="px-4 py-3">Status</th>
-            <th className="px-4 py-3">Time</th>
+            <th className="px-4 py-4 font-medium">Prompt</th>
+            <th className="px-4 py-4 font-medium">Model</th>
+            <th className="px-4 py-4 font-medium">Tokens</th>
+            <th className="px-4 py-4 font-medium">Latency</th>
+            <th className="px-4 py-4 font-medium">Cost</th>
+            <th className="px-4 py-4 font-medium">Quality</th>
+            <th className="px-4 py-4 font-medium">Status</th>
+            <th className="px-4 py-4 font-medium">Time</th>
           </tr>
         </thead>
         <tbody>
@@ -24,30 +24,27 @@ export default function TraceTable({ traces }) {
             <tr
               key={t.traceId}
               onClick={() => navigate(`/traces/${t.traceId}`)}
-              className="border-t border-white/10 transition-colors duration-150 hover:bg-white/5 cursor-pointer"
+              className="border-t border-black/5 hover:bg-canvas cursor-pointer whitespace-nowrap"
             >
-              <td className="px-4 py-3 text-slate-200 max-w-xs truncate">
-                {t.input}
-              </td>
-              <td className="px-4 py-3 text-slate-400">{t.model}</td>
-              <td className="px-4 py-3 text-slate-400">{t.tokenUsage.total}</td>
-              <td className="px-4 py-3 text-slate-400">{t.durationMs} ms</td>
-              <td className="px-4 py-3 text-slate-400">
-                ${t.cost.toFixed(4)}
-              </td>
-              <td className="px-4 py-3 text-slate-400" title={t.evaluation?.rationale}>
+              <td className="px-4 py-3.5 font-medium max-w-xs truncate">{t.input}</td>
+              <td className="px-4 py-3.5 text-slate-600">{t.model}</td>
+              <td className="px-4 py-3.5 text-slate-600">{t.tokenUsage.total}</td>
+              <td className="px-4 py-3.5 text-slate-600">{t.durationMs} ms</td>
+              <td className="px-4 py-3.5 text-slate-600">${t.cost.toFixed(4)}</td>
+              <td className="px-4 py-3.5 text-slate-600" title={t.evaluation?.rationale}>
                 {t.evaluation?.score ? `${t.evaluation.score}/5` : "–"}
               </td>
-              <td className="px-4 py-3">
+              <td className="px-4 py-3.5">
                 <StatusBadge status={t.status} />
               </td>
-              <td className="px-4 py-3 text-slate-500">
-                {new Date(t.createdAt).toLocaleString()}
+              <td className="px-4 py-3.5 text-slate-500">
+                {new Date(t.createdAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      {traces.length === 0 && <p className="px-4 pb-5 text-sm text-slate-500">No traces yet.</p>}
     </div>
   );
 }
