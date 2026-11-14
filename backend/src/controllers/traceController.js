@@ -59,6 +59,31 @@ export async function getModelStats(req, res) {
   res.json(stats);
 }
 
+// Quality scores from the evaluation service
+export async function getEvaluations(req, res) {
+  const applicationIds = await getUserApplicationIds(req.user.id);
+  const evaluated = { application: { $in: applicationIds }, "evaluation.score": { $ne: null } };
+
+  const scores = await Trace.aggregate([
+    { $match: evaluated },
+    { $group: { _id: "$evaluation.score", count: { $sum: 1 } } },
+  ]);
+  const recent = await Trace.find(evaluated)
+    .select("traceId input model evaluation createdAt")
+    .sort({ createdAt: -1 })
+    .limit(20);
+
+  // scoreCounts[0] = how many got 1/5, ..., scoreCounts[4] = how many got 5/5
+  const scoreCounts = [0, 0, 0, 0, 0];
+  for (const { _id, count } of scores) scoreCounts[_id - 1] = count;
+
+  const total = scoreCounts.reduce((sum, n) => sum + n, 0);
+  const scoreSum = scoreCounts.reduce((sum, n, i) => sum + n * (i + 1), 0);
+  const averageScore = total ? Number((scoreSum / total).toFixed(2)) : null;
+
+  res.json({ total, averageScore, scoreCounts, recent });
+}
+
 // Wrap in quotes so commas and quotes inside text don't break the CSV
 function csvCell(value) {
   return `"${String(value ?? "").replace(/"/g, '""')}"`;

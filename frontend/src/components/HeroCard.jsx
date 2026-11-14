@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Sparkles } from "lucide-react";
 
 export default function HeroCard() {
@@ -17,12 +18,12 @@ export default function HeroCard() {
         </p>
       </div>
       <div className="space-y-2 mt-6">
-        <button
-          className="w-full bg-white/90 text-slate-900 text-sm font-medium rounded-lg py-2 opacity-60 cursor-not-allowed"
-          disabled
+        <Link
+          to="/evaluations"
+          className="block text-center w-full bg-white/90 hover:bg-white text-slate-900 text-sm font-medium rounded-lg py-2 transition"
         >
           View Evaluations
-        </button>
+        </Link>
       </div>
     </div>
   );

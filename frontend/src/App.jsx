@@ -7,6 +7,7 @@ import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Traces from "./pages/Traces.jsx";
 import TraceDetail from "./pages/TraceDetail.jsx";
+import Evaluations from "./pages/Evaluations.jsx";
 import Applications from "./pages/Applications.jsx";
 
 export default function App() {
@@ -40,6 +41,7 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/traces" element={<Traces />} />
             <Route path="/traces/:traceId" element={<TraceDetail />} />
+            <Route path="/evaluations" element={<Evaluations />} />
             <Route path="/applications" element={<Applications />} />
           </Routes>
         </div>
