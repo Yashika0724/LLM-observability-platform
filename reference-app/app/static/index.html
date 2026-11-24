@@ -5,53 +5,307 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reference LLM App</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; color: #18181b; }
-    h2 { margin-bottom: 4px; }
-    p.sub { color: #71717a; margin-top: 0; }
-    textarea { width: 100%; height: 90px; padding: 8px; box-sizing: border-box; font-size: 14px; }
-    select, button { padding: 8px 12px; font-size: 14px; }
-    button { background: #18181b; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
-    button:disabled { opacity: 0.5; cursor: default; }
-    .row { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
-    #answer { white-space: pre-wrap; background: #f4f4f5; padding: 16px; border-radius: 8px; margin-top: 16px; min-height: 24px; }
-    #status { color: #71717a; font-size: 13px; }
+    :root {
+      --bg: #f5f2ec;
+      --sidebar: #efeae1;
+      --border: #e4ded1;
+      --border-strong: #d8d1c2;
+      --card: #fffdf9;
+      --text: #26251f;
+      --muted: #847f75;
+      --accent: #b45f3f;
+      --accent-soft: #f2e5de;
+      --user-bubble: #ece3d6;
+      --btn: #26251f;
+      --ok: #4e8a46;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ---------- Sidebar ---------- */
+    .sidebar {
+      width: 252px; flex-shrink: 0;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      padding: 18px 14px;
+    }
+    .brand { display: flex; align-items: center; gap: 9px; padding: 2px 6px 16px; }
+    .brand .mark {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: var(--accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .brand .nm { font-weight: 600; font-size: 14.5px; letter-spacing: -0.2px; }
+    .new-btn {
+      display: flex; align-items: center; gap: 8px; width: 100%;
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border-strong); border-radius: 10px;
+      padding: 9px 12px; font-size: 13.5px; cursor: pointer;
+    }
+    .new-btn:hover { background: #e7e1d6; }
+    .side-label {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); padding: 18px 8px 6px;
+    }
+    .history { flex: 1; overflow-y: auto; }
+    .history-item { padding: 8px 10px; border-radius: 8px; cursor: pointer; margin-bottom: 1px; }
+    .history-item:hover { background: #e7e1d6; }
+    .history-item.active { background: #e2dacb; }
+    .history-item .q {
+      font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .history-item .meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .history-empty { font-size: 12.5px; color: var(--muted); padding: 8px 10px; line-height: 1.5; }
+
+    /* ---------- Main ---------- */
+    .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px; border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .header .ttl { font-size: 15px; font-weight: 600; }
+    .header .st { font-size: 12.5px; color: var(--muted); margin-top: 1px; }
+    .header .right { display: flex; align-items: center; gap: 12px; }
+    .status-chip {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--ok);
+      background: #e8f1e5; border-radius: 999px; padding: 4px 10px;
+    }
+    .status-chip .d { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+    .user-pill {
+      display: flex; align-items: center; gap: 7px;
+      border: 1px solid var(--border-strong); border-radius: 999px; padding: 4px 10px 4px 5px;
+      background: var(--card);
+    }
+    .user-pill .av {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--accent-soft); color: var(--accent);
+      display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;
+    }
+    .user-pill select {
+      border: none; background: transparent; font-size: 12.5px; color: var(--text);
+      cursor: pointer; outline: none;
+    }
+
+    /* ---------- Thread ---------- */
+    .thread { flex: 1; overflow-y: auto; padding: 26px 24px; }
+    .thread-inner { max-width: 720px; margin: 0 auto; }
+    .empty {
+      height: 100%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center; color: var(--muted);
+      gap: 10px;
+    }
+    .empty .ring {
+      width: 46px; height: 46px; border-radius: 12px;
+      background: var(--accent-soft); color: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .empty h2 { font-size: 16px; font-weight: 600; color: var(--text); margin: 0; }
+    .empty p { font-size: 13.5px; margin: 0; }
+
+    .msg { display: flex; gap: 11px; margin-bottom: 20px; }
+    .msg.user { flex-direction: row-reverse; }
+    .msg .av2 {
+      width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600;
+    }
+    .msg.user .av2 { background: var(--user-bubble); color: #5c564a; }
+    .msg.bot .av2 { background: var(--accent); color: #fff; }
+    .bubble {
+      padding: 12px 15px; border-radius: 13px; font-size: 14.5px; line-height: 1.65;
+      max-width: 82%;
+    }
+    .msg.user .bubble { background: var(--user-bubble); border-top-right-radius: 4px; }
+    .msg.bot .bubble {
+      background: var(--card); border: 1px solid var(--border);
+      border-top-left-radius: 4px; color: #2f2d26;
+    }
+    .bubble p:first-child { margin-top: 0; }
+    .bubble p:last-child { margin-bottom: 0; }
+    .bubble code { background: #efe9df; padding: 1px 5px; border-radius: 5px; font-size: 90%; }
+    .bubble ul, .bubble ol { padding-left: 20px; margin: 8px 0; }
+    .typing { color: var(--muted); font-size: 14px; }
+
+    /* ---------- Composer ---------- */
+    .composer-wrap { padding: 14px 24px 20px; border-top: 1px solid var(--border); }
+    .composer {
+      max-width: 720px; margin: 0 auto;
+      background: var(--card); border: 1px solid var(--border-strong);
+      border-radius: 14px; padding: 10px 10px 10px 16px;
+      display: flex; align-items: flex-end; gap: 10px;
+    }
+    .composer:focus-within { border-color: #c7b8a6; }
+    textarea {
+      flex: 1; border: none; outline: none; resize: none; background: transparent;
+      font-family: inherit; font-size: 15px; color: var(--text);
+      line-height: 1.5; max-height: 140px; padding: 6px 0;
+    }
+    button#send {
+      background: var(--btn); color: #fff; border: none; border-radius: 10px;
+      width: 38px; height: 38px; flex-shrink: 0; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    button#send:disabled { opacity: 0.4; cursor: default; }
+    .hint { max-width: 720px; margin: 8px auto 0; font-size: 11.5px; color: var(--muted); text-align: center; }
+
+    @media (max-width: 720px) {
+      .sidebar { display: none; }
+    }
   </style>
 </head>
 <body>
-  <h2>Reference LLM App 🧪</h2>
-  <p class="sub">A simple chat box that generates traffic for the observability platform.</p>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg>
+      </div>
+      <div class="nm">Reference LLM App</div>
+    </div>
 
-  <div class="row">
-    <label for="user">User:</label>
-    <select id="user">
-      <option>user_1</option>
-      <option>user_2</option>
-      <option>user_3</option>
-    </select>
-  </div>
+    <button class="new-btn" id="newBtn">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      New chat
+    </button>
 
-  <textarea id="prompt" placeholder="Ask something..."></textarea>
+    <div class="side-label">History</div>
+    <div class="history" id="history">
+      <div class="history-empty">No questions yet. Your questions will appear here.</div>
+    </div>
+  </aside>
 
-  <div class="row">
-    <button id="send">Send</button>
-    <span id="status"></span>
-  </div>
+  <main class="main">
+    <div class="header">
+      <div>
+        <div class="ttl">Knowledge-base Assistant</div>
+        <div class="st">Answers grounded in the knowledge base</div>
+      </div>
+      <div class="right">
+        <div class="status-chip"><span class="d"></span> Tracing on</div>
+        <div class="user-pill">
+          <div class="av" id="av">U1</div>
+          <select id="user">
+            <option>user_1</option>
+            <option>user_2</option>
+            <option>user_3</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
-  <div id="answer"></div>
+    <div class="thread" id="thread">
+      <div class="thread-inner" id="threadInner">
+        <div class="empty" id="empty">
+          <div class="ring">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <h2>Ask anything</h2>
+          <p>Type a question below to get started.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="composer-wrap">
+      <div class="composer">
+        <textarea id="prompt" placeholder="Ask a question..." rows="1"></textarea>
+        <button id="send" title="Send">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+      </div>
+      <div class="hint">Enter to send · Shift + Enter for a new line</div>
+    </div>
+  </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
   <script>
     const btn = document.getElementById("send");
-    const answerBox = document.getElementById("answer");
-    const statusEl = document.getElementById("status");
+    const promptEl = document.getElementById("prompt");
+    const userEl = document.getElementById("user");
+    const avEl = document.getElementById("av");
+    const threadInner = document.getElementById("threadInner");
+    const threadEl = document.getElementById("thread");
+    const historyEl = document.getElementById("history");
+    const newBtn = document.getElementById("newBtn");
 
-    btn.onclick = async () => {
-      const prompt = document.getElementById("prompt").value.trim();
-      const user_id = document.getElementById("user").value;
+    function setAv() { avEl.textContent = "U" + userEl.value.split("_")[1]; }
+    // When the user changes, update the avatar AND load that user's history.
+    userEl.onchange = () => { setAv(); renderHistory(); };
+    setAv();
+
+    // ----- history (stored on the SERVER, per user) -----
+    function timeLabel(ts) {
+      return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+    async function fetchHistory() {
+      try {
+        const r = await fetch("/history/" + encodeURIComponent(userEl.value));
+        const d = await r.json();
+        return d.history || [];
+      } catch (e) { return []; }
+    }
+    async function renderHistory() {
+      const list = await fetchHistory();
+      if (!list.length) {
+        historyEl.innerHTML = '<div class="history-empty">No questions yet. Your questions will appear here.</div>';
+        return;
+      }
+      historyEl.innerHTML = "";
+      list.forEach((item) => {
+        const el = document.createElement("div");
+        el.className = "history-item";
+        el.innerHTML = '<div class="q"></div><div class="meta"></div>';
+        el.querySelector(".q").textContent = item.prompt;
+        el.querySelector(".meta").textContent = userEl.value + " · " + timeLabel(item.time);
+        el.onclick = () => { clearThread(); addMsg("user", item.prompt, userEl.value); addMsg("bot", item.answer); };
+        historyEl.appendChild(el);
+      });
+    }
+
+    // ----- thread -----
+    function clearThread() { threadInner.innerHTML = ""; }
+    function addMsg(role, text, user) {
+      const empty = document.getElementById("empty");
+      if (empty) empty.remove();
+      const msg = document.createElement("div");
+      msg.className = "msg " + role;
+      const av = role === "user" ? ("U" + (user ? user.split("_")[1] : userEl.value.split("_")[1]))
+                                 : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg>';
+      msg.innerHTML = '<div class="av2"></div><div class="bubble"></div>';
+      msg.querySelector(".av2").innerHTML = av;
+      const bubble = msg.querySelector(".bubble");
+      if (role === "bot") bubble.innerHTML = window.marked ? marked.parse(text) : text;
+      else bubble.textContent = text;
+      threadInner.appendChild(msg);
+      threadEl.scrollTop = threadEl.scrollHeight;
+      return bubble;
+    }
+
+    newBtn.onclick = () => {
+      threadInner.innerHTML =
+        '<div class="empty" id="empty"><div class="ring"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><h2>Ask anything</h2><p>Type a question below to get started.</p></div>';
+      promptEl.focus();
+    };
+
+    // ----- ask -----
+    async function ask() {
+      const prompt = promptEl.value.trim();
+      const user_id = userEl.value;
       if (!prompt) return;
 
-      statusEl.textContent = "Thinking...";
-      answerBox.textContent = "";
+      addMsg("user", prompt, user_id);
+      promptEl.value = "";
+      const pending = addMsg("bot", "");
+      pending.innerHTML = '<span class="typing">Thinking…</span>';
       btn.disabled = true;
 
       try {
@@ -62,15 +316,29 @@
         });
         const data = await res.json();
         const answer = data.answer ?? JSON.stringify(data);
-        // Render the Markdown answer as formatted HTML (bold, lists, headings...)
-        answerBox.innerHTML = window.marked ? marked.parse(answer) : answer;
+        pending.innerHTML = window.marked ? marked.parse(answer) : answer;
+        threadEl.scrollTop = threadEl.scrollHeight;
+
+        // The server already saved this Q&A; refresh the history list.
+        renderHistory();
       } catch (e) {
-        answerBox.textContent = "Error: " + e.message;
+        pending.textContent = "Error: " + e.message;
       } finally {
-        statusEl.textContent = "";
         btn.disabled = false;
       }
-    };
+    }
+
+    btn.onclick = ask;
+    promptEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(); }
+    });
+    // auto-grow the textarea
+    promptEl.addEventListener("input", () => {
+      promptEl.style.height = "auto";
+      promptEl.style.height = Math.min(promptEl.scrollHeight, 140) + "px";
+    });
+
+    renderHistory();
   </script>
 </body>
 </html>

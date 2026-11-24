@@ -7,3 +7,6 @@ __pycache__/
 
 # Secrets / local settings
 .env
+
+# Runtime chat history (per-user)
+data/history.json
