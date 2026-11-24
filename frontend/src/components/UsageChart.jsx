@@ -9,9 +9,10 @@ export default function UsageChart({ traces }) {
       {
         label: "Latency (ms)",
         data: oldestFirst.map((t) => t.durationMs),
-        borderColor: "#818cf8",
-        backgroundColor: "#818cf8",
+        borderColor: "#7C6CD8",
+        backgroundColor: "#7C6CD8",
         tension: 0.3,
+        pointRadius: 2,
       },
     ],
   };
@@ -19,15 +20,12 @@ export default function UsageChart({ traces }) {
   const options = {
     responsive: true,
     plugins: { legend: { display: false } },
-    scales: {
-      y: { beginAtZero: true, ticks: { color: "#64748b" }, grid: { color: "#1e293b" } },
-      x: { ticks: { color: "#64748b" }, grid: { color: "#1e293b" } },
-    },
+    scales: { y: { beginAtZero: true }, x: { ticks: { maxTicksLimit: 5 } } },
   };
 
   return (
-    <div className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg shadow-black/20 rounded-xl p-4 opacity-0 animate-fadeInUp transition-all duration-300 hover:border-white/20" style={{ animationDelay: "150ms" }}>
-      <p className="text-xs text-slate-500 mb-2">Latency per Trace</p>
+    <div className="card p-6">
+      <p className="font-semibold mb-4">Latency per trace</p>
       <Line data={data} options={options} />
     </div>
   );

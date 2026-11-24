@@ -1,7 +1,10 @@
 import axios from "axios";
 
+// Set VITE_API_URL when the backend is hosted somewhere else (e.g. on Render)
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 const api = axios.create({
-  baseURL: "http://localhost:8000/api",
+  baseURL: `${API_URL}/api`,
 });
 
 api.interceptors.request.use((config) => {

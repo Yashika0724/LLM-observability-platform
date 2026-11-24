@@ -12,9 +12,16 @@ export function totalTokens(traces) {
   return traces.reduce((acc, t) => acc + t.tokenUsage.total, 0);
 }
 
+// Sum of the costs we know; null if none of the traces has a known cost
 export function totalCostUsd(traces) {
-  const sum = traces.reduce((acc, t) => acc + t.cost, 0);
-  return sum.toFixed(4);
+  const known = traces.filter((t) => t.cost !== null);
+  if (traces.length > 0 && known.length === 0) return null;
+  return known.reduce((acc, t) => acc + t.cost, 0);
+}
+
+// null cost = model is not in the backend's price table
+export function formatCost(cost) {
+  return cost === null ? "–" : `$${cost.toFixed(4)}`;
 }
 
 export function errorRate(traces) {

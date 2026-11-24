@@ -1,72 +1,72 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Activity,
   LayoutDashboard,
   GitBranch,
   Sparkles,
-  Cpu,
-  Settings,
+  KeyRound,
+  ShieldCheck,
+  LogOut,
 } from "lucide-react";
 
 const navItems = [
-  { label: "Dashboard", path: "/dashboard", enabled: true, icon: LayoutDashboard },
-  { label: "Traces", enabled: false, icon: GitBranch },
-  { label: "Evaluations", enabled: false, icon: Sparkles },
-  { label: "Models", enabled: false, icon: Cpu },
-  { label: "Settings", enabled: false, icon: Settings },
+  { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { label: "Applications", path: "/applications", icon: KeyRound },
+  { label: "Traces", path: "/traces", icon: GitBranch },
+  { label: "Evaluations", path: "/evaluations", icon: Sparkles },
 ];
 
 export default function Sidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const items =
+    user.role === "admin"
+      ? [...navItems, { label: "Admin", path: "/admin", icon: ShieldCheck }]
+      : navItems;
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  }
 
   return (
-    <aside className="w-60 bg-white/5 backdrop-blur-xl border-r border-white/10 flex flex-col justify-between p-5 min-h-screen shrink-0">
-      <div>
-        <div className="flex items-center gap-2 mb-8">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
-            <Activity size={16} />
-          </div>
-          <div>
-            <p className="text-white font-display font-semibold leading-tight text-sm">
-              LLM Observability
-            </p>
-            <p className="text-xs text-slate-500">Trace & Evaluate</p>
-          </div>
+    <aside className="w-60 shrink-0 bg-ink text-white rounded-3xl p-5 flex flex-col sticky top-4 self-start h-[calc(100vh-2rem)]">
+      <div className="flex items-center gap-3 mb-10">
+        <div className="w-9 h-9 rounded-xl bg-cream text-ink flex items-center justify-center">
+          <Activity size={18} />
         </div>
-        <nav className="space-y-1">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return item.enabled ? (
-              <Link
-                key={item.label}
-                to={item.path}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  location.pathname === item.path
-                    ? "bg-white/10 text-white"
-                    : "text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-0.5"
-                }`}
-              >
-                <Icon size={16} />
-                {item.label}
-              </Link>
-            ) : (
-              <div
-                key={item.label}
-                className="flex items-center justify-between px-3 py-2 rounded-lg text-sm text-slate-600 cursor-not-allowed"
-              >
-                <span className="flex items-center gap-2">
-                  <Icon size={16} />
-                  {item.label}
-                </span>
-                <span className="text-[10px] bg-white/10 text-slate-500 px-2 py-0.5 rounded-full">
-                  soon
-                </span>
-              </div>
-            );
-          })}
-        </nav>
+        <p className="font-semibold leading-tight">LLM Observability</p>
       </div>
-      <p className="text-xs text-slate-600">Week 1 Scaffold</p>
+
+      <p className="text-xs text-white/40 mb-3 px-3">General</p>
+      <nav className="space-y-1 flex-1">
+        {items.map((item) => {
+          const Icon = item.icon;
+          const active = location.pathname === item.path;
+          return (
+            <Link
+              key={item.label}
+              to={item.path}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition ${
+                active ? "bg-white/10 text-white" : "text-white/60 hover:text-white"
+              }`}
+            >
+              <Icon size={17} />
+              {item.label}
+            </Link>
+          );
+        })}
+      </nav>
+
+      <button
+        onClick={handleLogout}
+        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/60 hover:text-white transition"
+      >
+        <LogOut size={17} />
+        Log out
+      </button>
     </aside>
   );
 }

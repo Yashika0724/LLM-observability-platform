@@ -4,27 +4,18 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
-        display: ["Sora", "sans-serif"],
+        sans: ['"Plus Jakarta Sans"', "sans-serif"],
       },
-      keyframes: {
-        fadeInUp: {
-          "0%": { opacity: 0, transform: "translateY(12px)" },
-          "100%": { opacity: 1, transform: "translateY(0)" },
-        },
-        floatSlow: {
-          "0%, 100%": { transform: "translate(0px, 0px) scale(1)" },
-          "50%": { transform: "translate(20px, -20px) scale(1.05)" },
-        },
-        floatMed: {
-          "0%, 100%": { transform: "translate(0px, 0px) scale(1)" },
-          "50%": { transform: "translate(-16px, 16px) scale(1.03)" },
-        },
-      },
-      animation: {
-        fadeInUp: "fadeInUp 0.5s ease-out forwards",
-        floatSlow: "floatSlow 10s ease-in-out infinite",
-        floatMed: "floatMed 13s ease-in-out infinite",
+      colors: {
+        canvas: "#F4F3EE", // page background
+        ink: "#141414", // main text, sidebar, dark card
+        accent: "#7C6CD8",
+        // soft tiles for highlighted numbers
+        lavender: "#E6E0F8",
+        mint: "#DCEFDF",
+        cream: "#F7F0D2",
+        blush: "#F9DCE7",
+        sky: "#D9E8F8",
       },
     },
   },

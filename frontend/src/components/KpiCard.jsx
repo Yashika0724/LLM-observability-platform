@@ -1,16 +1,16 @@
-export default function KpiCard({ label, value, delay = 0 }) {
+// tone = background colour of the tile, e.g. "bg-lavender"
+export default function KpiCard({ label, value, icon: Icon, tone = "bg-lavender" }) {
   return (
-    <div
-      className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg shadow-black/20 rounded-xl p-4 opacity-0 animate-fadeInUp transition-all duration-200 hover:border-white/20 hover:-translate-y-0.5"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-xs text-slate-500">{label}</p>
-        <span className="text-[10px] bg-white/10 text-slate-500 px-2 py-0.5 rounded-full">
-          24H
-        </span>
+    <div className={`${tone} rounded-2xl p-5`}>
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-ink/60">{label}</p>
+        {Icon && (
+          <span className="w-9 h-9 rounded-xl bg-white flex items-center justify-center">
+            <Icon size={16} />
+          </span>
+        )}
       </div>
-      <p className="text-2xl font-display font-semibold text-white">{value}</p>
+      <p className="text-3xl font-bold tracking-tight mt-6">{value}</p>
     </div>
   );
 }

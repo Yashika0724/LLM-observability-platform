@@ -1,7 +1,10 @@
 import { fileURLToPath } from "url";
 import protobuf from "protobufjs";
 import Trace from "../models/Trace.js";
+import { calculateCost } from "../utils/pricing.js";
+import { addEvalJob } from "../utils/queue.js";
 
+// Load OTLP format for decoding
 const protoPath = fileURLToPath(new URL("../proto/trace.proto", import.meta.url));
 const ExportTraceServiceRequest = protobuf
   .loadSync(protoPath)
@@ -28,14 +31,16 @@ async function saveSpan(applicationId, span) {
     attributes[key] = readValue(value);
   }
 
-  const startTime = new Date(span.startTimeUnixNano / 1e6);
+  const startTime = new Date(span.startTimeUnixNano / 1e6); // ns -> ms
   const endTime = new Date(span.endTimeUnixNano / 1e6);
-  const status = span.status?.code === 2 ? "error" : "success";
+  const status = span.status?.code === 2 ? "error" : "success"; // 2 = error
   const traceId = toHex(span.traceId);
 
+  // Group spans by traceId
   let trace = await Trace.findOne({ traceId });
   if (!trace) {
     trace = new Trace({ traceId, application: applicationId, startTime, endTime, durationMs: 0 });
+    console.log(`  new trace ${traceId.slice(0, 8)}`);
   }
 
   trace.spans.push({
@@ -49,10 +54,12 @@ async function saveSpan(applicationId, span) {
     attributes,
   });
 
+  // Total duration
   if (startTime < trace.startTime) trace.startTime = startTime;
   if (endTime > trace.endTime) trace.endTime = endTime;
   trace.durationMs = trace.endTime - trace.startTime;
 
+  // One failed span = failed trace
   if (status === "error") {
     trace.status = "error";
     trace.error = span.status.message || attributes["error.type"];
@@ -66,18 +73,39 @@ async function saveSpan(applicationId, span) {
     trace.model = attributes["gen_ai.response.model"] ?? attributes["gen_ai.request.model"];
     trace.input = lastMessageText(attributes["gen_ai.input.messages"]);
     trace.output = lastMessageText(attributes["gen_ai.output.messages"]);
-    trace.tokenUsage.prompt += attributes["gen_ai.usage.input_tokens"] ?? 0;
-    trace.tokenUsage.completion += attributes["gen_ai.usage.output_tokens"] ?? 0;
+    const inputTokens = attributes["gen_ai.usage.input_tokens"] ?? 0;
+    const outputTokens = attributes["gen_ai.usage.output_tokens"] ?? 0;
+    trace.tokenUsage.prompt += inputTokens;
+    trace.tokenUsage.completion += outputTokens;
     trace.tokenUsage.total += attributes["gen_ai.usage.total_tokens"] ?? 0;
+    const callCost = calculateCost(trace.model, inputTokens, outputTokens);
+    // One call with an unknown price makes the whole trace's cost unknown
+    trace.cost = callCost === null || trace.cost === null ? null : trace.cost + callCost;
+    const costText = trace.cost === null ? "cost unknown" : `$${trace.cost.toFixed(6)}`;
+    console.log(`  LLM call: ${trace.model} | ${inputTokens} in / ${outputTokens} out tokens | ${costText} | "${trace.input}"`);
   }
 
   await trace.save();
+  console.log(`  saved span "${span.name}" (${endTime - startTime} ms) -> trace ${traceId.slice(0, 8)}`);
+
+  // Queue for quality scoring, without waiting for it
+  if (attributes["gen_ai.operation.name"] && trace.output) {
+    addEvalJob(traceId)
+      .then(() => console.log(`  queued trace ${traceId.slice(0, 8)} for evaluation`))
+      .catch((err) => console.log(`  could not queue trace ${traceId.slice(0, 8)}: ${err.message}`));
+  }
 }
 
 export async function ingestTraces(req, res) {
+  // Decode protobuf body
   const message = ExportTraceServiceRequest.decode(req.body);
   const request = ExportTraceServiceRequest.toObject(message, { longs: Number, arrays: true });
+  const spanCount = request.resourceSpans
+    .flatMap((resourceSpans) => resourceSpans.scopeSpans)
+    .reduce((count, scopeSpans) => count + scopeSpans.spans.length, 0);
+  console.log(`[ingest] decoded ${spanCount} spans from ${req.body.length} bytes of protobuf`);
 
+  // resourceSpans -> scopeSpans -> spans
   for (const resourceSpans of request.resourceSpans) {
     for (const scopeSpans of resourceSpans.scopeSpans) {
       for (const span of scopeSpans.spans) {

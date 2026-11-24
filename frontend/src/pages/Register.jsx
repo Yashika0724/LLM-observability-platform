@@ -26,25 +26,25 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <form
         onSubmit={handleSubmit}
-        className="bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl shadow-black/40 rounded-xl p-8 w-full max-w-sm space-y-4 opacity-0 animate-fadeInUp"
+        className="card p-8 w-full max-w-sm space-y-4"
       >
         <div className="flex items-center gap-2 mb-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+          <div className="w-9 h-9 rounded-xl bg-ink text-cream flex items-center justify-center">
             <Activity size={16} />
           </div>
-          <p className="text-white font-display font-semibold">LLM Observability</p>
+          <p className="font-semibold">LLM Observability</p>
         </div>
-        <h1 className="text-lg font-display font-semibold text-white">Register</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Register</h1>
         <input
           type="text"
           name="name"
           placeholder="Name"
           value={form.name}
           onChange={handleChange}
-          className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/40"
+          className="field w-full"
           required
         />
         <input
@@ -53,7 +53,7 @@ export default function Register() {
           placeholder="Email"
           value={form.email}
           onChange={handleChange}
-          className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/40"
+          className="field w-full"
           required
         />
         <input
@@ -62,19 +62,19 @@ export default function Register() {
           placeholder="Password"
           value={form.password}
           onChange={handleChange}
-          className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/40"
+          className="field w-full"
           required
         />
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {error && <p className="text-xs text-red-600">{error}</p>}
         <button
           type="submit"
-          className="w-full bg-indigo-500 hover:bg-indigo-400 text-white rounded-lg py-2 text-sm font-medium transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5"
+          className="btn w-full py-2.5"
         >
           Create Account
         </button>
         <p className="text-xs text-slate-500 text-center">
           Already have an account?{" "}
-          <Link to="/" className="text-indigo-400">
+          <Link to="/" className="font-medium text-ink underline">
             Login
           </Link>
         </p>
