@@ -82,6 +82,13 @@
       background: #e8f1e5; border-radius: 999px; padding: 4px 10px;
     }
     .status-chip .d { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+    .dash-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12.5px; color: var(--text); text-decoration: none;
+      border: 1px solid var(--border-strong); border-radius: 999px;
+      padding: 5px 12px; background: var(--card);
+    }
+    .dash-link:hover { background: #efeae1; }
     .user-pill {
       display: flex; align-items: center; gap: 7px;
       border: 1px solid var(--border-strong); border-radius: 999px; padding: 4px 10px 4px 5px;
@@ -191,6 +198,10 @@
         <div class="st">Answers grounded in the knowledge base</div>
       </div>
       <div class="right">
+        <a class="dash-link" href="https://llm-obs-frontend.onrender.com" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+          View Dashboard
+        </a>
         <div class="status-chip"><span class="d"></span> Tracing on</div>
         <div class="user-pill">
           <div class="av" id="av">U1</div>
