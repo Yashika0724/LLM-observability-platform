@@ -31,9 +31,10 @@ def ask_llm(prompt: str, user_id: str) -> str:
     context = "\n\n".join(context_docs)
 
     system_message = (
-        "You are a helpful assistant. Answer the question based on the context "
-        "below. Use the relevant information from it to give a short, clear "
-        "answer. Only say you don't know if the context has nothing relevant.\n\n"
+        "You are a helpful assistant. Use the context below if it is relevant to "
+        "the question. If the context does not contain the answer, answer from your "
+        "own general knowledge instead. Give a short, clear answer, and do not say "
+        "you don't know unless the question is genuinely unanswerable.\n\n"
         "Context:\n" + context
     )
 
