@@ -7,7 +7,10 @@ import {
   KeyRound,
   ShieldCheck,
   LogOut,
+  MessageSquare,
 } from "lucide-react";
+
+const CHATBOT_URL = "https://reference-llm-app.onrender.com";
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
@@ -58,6 +61,16 @@ export default function Sidebar() {
             </Link>
           );
         })}
+
+        <a
+          href={CHATBOT_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/60 hover:text-white transition"
+        >
+          <MessageSquare size={17} />
+          Chatbot
+        </a>
       </nav>
 
       <button
