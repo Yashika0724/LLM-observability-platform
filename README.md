@@ -181,7 +181,7 @@ How it answers a question:
 3. **Generate:** the question and the retrieved documents go to an LLM through **OpenRouter**, which answers using that context.
 4. **Trace:** **OpenLLMetry** records both steps automatically and sends them to the platform's `/v1/traces` endpoint with the app's API key. Trace export runs in the background, so a slow or offline backend never delays the user's answer.
 
-It has a simple chat page (`app/static/index.html`) and a script (`scripts/send_traffic.py`) that sends real WikiQA questions from a few mock users, so the dashboard fills with varied traces.
+It has a simple chat page (`app/static/index.html`) with a **View Dashboard** link to the live platform, and a script (`scripts/send_traffic.py`) that sends real WikiQA questions from a few mock users, so the dashboard fills with varied traces. The chat page keeps a per-user **history** saved on the server (`data/history.json`, via a `GET /history/{user_id}` endpoint), so it persists across restarts and browsers.
 
 **Tech:** Python, FastAPI, ChromaDB, OpenRouter, OpenLLMetry (traceloop-sdk)
 
