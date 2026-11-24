@@ -175,6 +175,8 @@ After that, every LLM call your app makes is traced automatically.
 
 `reference-app/` is a real LLM application built to show the platform working end to end. It is a **RAG (Retrieval-Augmented Generation)** question-answering app. Instead of answering from memory alone, the model first looks up relevant facts and answers using them.
 
+**Live chatbot:** https://reference-llm-app.onrender.com (free plan, so the first visit after a quiet period can take up to a minute to wake up).
+
 How it answers a question:
 1. **Knowledge base:** at startup, documents built from the WikiQA dataset (`data/knowledge_base.json`) are loaded into **ChromaDB**, an in-memory vector database that searches by meaning.
 2. **Retrieve:** the 3 documents most relevant to the question are fetched. This step is traced as its own span, `retrieve_documents`.
